@@ -17,7 +17,7 @@ export default function MLOpsDashboard() {
   const [deployments] = useState<Deployment[]>([
     {
       id: 1,
-      name: 'Credit Risk Scoring v1',
+      name: 'Credit Risk Scoring Engine v1',
       environment: 'production',
       status: 'deployed',
       version: '1.2.0',
@@ -25,7 +25,7 @@ export default function MLOpsDashboard() {
       latency_ms: 24.5,
       request_rate: 450,
       error_rate: 0.001,
-      api_endpoint: 'http://localhost:8000/api/inference/infer'
+      api_endpoint: 'https://ml-dataset-analyzer-backend.onrender.com/api/inference/infer'
     },
     {
       id: 2,
@@ -37,100 +37,137 @@ export default function MLOpsDashboard() {
       latency_ms: 18.2,
       request_rate: 45,
       error_rate: 0.0,
-      api_endpoint: 'http://localhost:8000/api/inference/infer'
+      api_endpoint: 'https://ml-dataset-analyzer-backend.onrender.com/api/inference/infer'
     }
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">MLOps & Deployment Platform</h1>
-            <p className="text-gray-600">Model lifecycle registry, deployment metrics, canary A/B testing & rollbacks</p>
-          </div>
-          <button className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700">
-            Register New Model
-          </button>
+    <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+      {/* Title Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <div>
+          <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '6px', background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            MLOps & Deployment Platform
+          </h1>
+          <p style={{ color: '#9ca3af', fontSize: '14px' }}>
+            Model lifecycle registry, deployment health metrics, canary A/B testing & automated rollbacks
+          </p>
+        </div>
+        <button style={{
+          background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '10px',
+          padding: '12px 20px',
+          fontWeight: '700',
+          fontSize: '14px',
+          cursor: 'pointer',
+          boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)'
+        }}>
+          + Register New Model
+        </button>
+      </div>
+
+      {/* Metric Cards Banner */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+        <div style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '12px', padding: '20px' }}>
+          <p style={{ fontSize: '13px', color: '#9ca3af', fontWeight: '500' }}>Active Deployments</p>
+          <p style={{ fontSize: '32px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>2</p>
+          <span style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '600' }}>
+            ● 100% Healthy
+          </span>
         </div>
 
-        {/* Status Metrics Banner */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm font-medium text-gray-500">Active Deployments</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">2</p>
-            <span className="inline-block mt-2 px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded">100% Healthy</span>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm font-medium text-gray-500">Average Latency (p50)</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">21.35 ms</p>
-            <span className="inline-block mt-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded">-4.2 ms vs baseline</span>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm font-medium text-gray-500">Throughput</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">495 req/s</p>
-            <span className="inline-block mt-2 px-2 py-0.5 text-xs bg-purple-100 text-purple-800 rounded">Peak 620 req/s</span>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm font-medium text-gray-500">Global Error Rate</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">0.08%</p>
-            <span className="inline-block mt-2 px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded">Within SLA</span>
-          </div>
+        <div style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '12px', padding: '20px' }}>
+          <p style={{ fontSize: '13px', color: '#9ca3af', fontWeight: '500' }}>Average Latency (p50)</p>
+          <p style={{ fontSize: '32px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>21.35 ms</p>
+          <span style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '600' }}>
+            -4.2 ms vs baseline
+          </span>
         </div>
 
-        {/* Deployments List */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">Active Model Deployments</h2>
-          </div>
+        <div style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '12px', padding: '20px' }}>
+          <p style={{ fontSize: '13px', color: '#9ca3af', fontWeight: '500' }}>Global Throughput</p>
+          <p style={{ fontSize: '32px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>495 req/s</p>
+          <span style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#a78bfa', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '600' }}>
+            Peak 620 req/s
+          </span>
+        </div>
 
-          <div className="divide-y divide-gray-200">
-            {deployments.map((dep) => (
-              <div key={dep.id} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-bold text-gray-900">{dep.name}</h3>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                      dep.environment === 'production' ? 'bg-purple-100 text-purple-800' : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {dep.environment.toUpperCase()}
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">v{dep.version}</span>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1 font-mono">{dep.api_endpoint}</p>
+        <div style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '12px', padding: '20px' }}>
+          <p style={{ fontSize: '13px', color: '#9ca3af', fontWeight: '500' }}>Global Error Rate</p>
+          <p style={{ fontSize: '32px', fontWeight: '800', color: '#fff', margin: '8px 0' }}>0.08%</p>
+          <span style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: '600' }}>
+            Within SLA
+          </span>
+        </div>
+      </div>
+
+      {/* Active Deployments Table Card */}
+      <div style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '14px', overflow: 'hidden' }}>
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid #374151', backgroundColor: '#111827' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#fff' }}>Active Model Deployments</h2>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {deployments.map((dep) => (
+            <div key={dep.id} style={{
+              padding: '24px',
+              borderBottom: '1px solid #374151',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '16px'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#fff' }}>{dep.name}</h3>
+                  <span style={{
+                    background: dep.environment === 'production' ? 'rgba(139, 92, 246, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                    color: dep.environment === 'production' ? '#c084fc' : '#fbbf24',
+                    border: dep.environment === 'production' ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)',
+                    padding: '2px 10px',
+                    borderRadius: '9999px',
+                    fontSize: '11px',
+                    fontWeight: '700'
+                  }}>
+                    {dep.environment.toUpperCase()}
+                  </span>
+                  <span style={{ background: '#111827', color: '#9ca3af', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontFamily: 'monospace' }}>
+                    v{dep.version}
+                  </span>
+                </div>
+                <p style={{ fontSize: '13px', color: '#6b7280', fontFamily: 'monospace' }}>{dep.api_endpoint}</p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '11px', color: '#9ca3af', display: 'block' }}>Latency</span>
+                  <span style={{ fontSize: '16px', fontWeight: '700', color: '#fff' }}>{dep.latency_ms} ms</span>
                 </div>
 
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500">Latency</p>
-                    <p className="font-semibold">{dep.latency_ms} ms</p>
-                  </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '11px', color: '#9ca3af', display: 'block' }}>Throughput</span>
+                  <span style={{ fontSize: '16px', fontWeight: '700', color: '#fff' }}>{dep.request_rate} req/s</span>
+                </div>
 
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500">Throughput</p>
-                    <p className="font-semibold">{dep.request_rate} req/s</p>
-                  </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '11px', color: '#9ca3af', display: 'block' }}>Replicas</span>
+                  <span style={{ fontSize: '16px', fontWeight: '700', color: '#fff' }}>{dep.replicas} pods</span>
+                </div>
 
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500">Replicas</p>
-                    <p className="font-semibold">{dep.replicas} pods</p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200">
-                      Metrics
-                    </button>
-                    <button className="px-3 py-1.5 bg-red-50 text-red-600 rounded text-sm hover:bg-red-100">
-                      Rollback
-                    </button>
-                  </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button style={{ background: '#374151', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '6px', fontSize: '13px', cursor: 'pointer' }}>
+                    Metrics
+                  </button>
+                  <button style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '8px 14px', borderRadius: '6px', fontSize: '13px', cursor: 'pointer' }}>
+                    Rollback
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
