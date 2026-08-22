@@ -1,0 +1,5 @@
+aws_region   = "us-east-1"
+app_name     = "ml-analyzer"
+environment  = "production"
+instance_type = "t3.xlarge"
+db_username  = "mlanalyzer"
