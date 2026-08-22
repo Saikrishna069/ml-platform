@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.db.marketplace_models import (
-    PublishedModel, ModelVersion, ModelReview, ModelUsageRecord,
+    PublishedModel, MarketplaceModelVersion as ModelVersion, ModelReview, ModelUsageRecord,
     ModelPurchase, ModelCollection
 )
 from app.db import models
