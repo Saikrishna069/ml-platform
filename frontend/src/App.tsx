@@ -8,62 +8,125 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'marketplace' | 'mlops' | 'analytics' | 'explainability'>('marketplace');
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-      {/* Top Navbar */}
-      <header className="bg-gray-900 text-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-lg">
+    <div style={{ minHeight: '100vh', backgroundColor: '#0b0f19', color: '#f9fafb', display: 'flex', flexDirection: 'column' }}>
+      {/* Sleek Top Header Navigation */}
+      <header style={{ backgroundColor: '#111827', borderBottom: '1px solid #1f2937', padding: '16px 32px' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 'bold',
+              fontSize: '18px',
+              color: '#fff',
+              boxShadow: '0 4px 15px rgba(59, 130, 246, 0.4)'
+            }}>
               ML
             </div>
-            <span className="text-xl font-bold tracking-tight">Enterprise ML Platform</span>
+            <div>
+              <h1 style={{ fontSize: '20px', fontWeight: '800', tracking: '-0.5px', background: 'linear-gradient(135deg, #ffffff 0%, #9ca3af 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Enterprise ML Platform
+              </h1>
+              <p style={{ fontSize: '11px', color: '#6b7280' }}>AutoML • Marketplace • MLOps • Analytics</p>
+            </div>
           </div>
 
-          <nav className="flex items-center gap-2">
+          {/* Navigation Bar Tabs */}
+          <nav style={{ display: 'flex', gap: '8px', background: 'rgba(31, 41, 55, 0.5)', padding: '6px', borderRadius: '12px', border: '1px solid #374151' }}>
             <button
               onClick={() => setActiveTab('marketplace')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                activeTab === 'marketplace' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'
-              }`}
+              style={{
+                padding: '8px 18px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                background: activeTab === 'marketplace' ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' : 'transparent',
+                color: activeTab === 'marketplace' ? '#ffffff' : '#9ca3af',
+                boxShadow: activeTab === 'marketplace' ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none'
+              }}
             >
-              Model Marketplace
+              🛒 Model Marketplace
             </button>
             <button
               onClick={() => setActiveTab('mlops')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                activeTab === 'mlops' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'
-              }`}
+              style={{
+                padding: '8px 18px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                background: activeTab === 'mlops' ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' : 'transparent',
+                color: activeTab === 'mlops' ? '#ffffff' : '#9ca3af',
+                boxShadow: activeTab === 'mlops' ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none'
+              }}
             >
-              MLOps Platform
+              🚀 MLOps Platform
             </button>
             <button
               onClick={() => setActiveTab('analytics')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                activeTab === 'analytics' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'
-              }`}
+              style={{
+                padding: '8px 18px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                background: activeTab === 'analytics' ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' : 'transparent',
+                color: activeTab === 'analytics' ? '#ffffff' : '#9ca3af',
+                boxShadow: activeTab === 'analytics' ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none'
+              }}
             >
-              A/B Experimentation
+              📊 A/B Testing
             </button>
             <button
               onClick={() => setActiveTab('explainability')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                activeTab === 'explainability' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'
-              }`}
+              style={{
+                padding: '8px 18px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                background: activeTab === 'explainability' ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' : 'transparent',
+                color: activeTab === 'explainability' ? '#ffffff' : '#9ca3af',
+                boxShadow: activeTab === 'explainability' ? '0 4px 12px rgba(59, 130, 246, 0.3)' : 'none'
+              }}
             >
-              Explainability (SHAP)
+              🧠 Explainability (SHAP)
             </button>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <span className="text-xs bg-green-500/20 text-green-400 border border-green-500/30 px-2.5 py-1 rounded-full font-mono">
-              ● API Live
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{
+              background: 'rgba(16, 185, 129, 0.15)',
+              color: '#34d399',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              padding: '4px 12px',
+              borderRadius: '9999px',
+              fontSize: '12px',
+              fontWeight: '600',
+              fontFamily: 'monospace'
+            }}>
+              ● API Online
             </span>
           </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1">
+      {/* Main Section */}
+      <main style={{ flex: 1, padding: '32px 16px', maxWidth: '1280px', margin: '0 auto', width: '100%' }}>
         {activeTab === 'marketplace' && <Marketplace />}
         {activeTab === 'mlops' && <MLOpsDashboard />}
         {activeTab === 'analytics' && <AdvancedAnalytics />}
@@ -71,7 +134,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6 text-center text-sm text-gray-500">
+      <footer style={{ backgroundColor: '#111827', borderTop: '1px solid #1f2937', padding: '20px', textAlign: 'center', fontSize: '13px', color: '#6b7280' }}>
         Enterprise Multi-Tenant AutoML, Marketplace & MLOps Platform — 100% Free Production Ready
       </footer>
     </div>
