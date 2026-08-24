@@ -53,9 +53,9 @@ class PublishedModel(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     published_at = Column(DateTime, nullable=True)
 
-class MarketplaceModelVersion(Base):
-    """Marketplace model versions"""
-    __tablename__ = "marketplace_model_versions"
+class ModelVersion(Base):
+    """Model versions"""
+    __tablename__ = "model_versions"
     
     id = Column(Integer, primary_key=True, index=True)
     model_id = Column(Integer, ForeignKey("published_models.id"), nullable=False)

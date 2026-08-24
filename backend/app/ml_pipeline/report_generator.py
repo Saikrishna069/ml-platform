@@ -12,14 +12,9 @@ class ReportGenerator:
         self.results = results
         self.best_model = best_model
         self.timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-    def generate_json_report(self) -> Dict[str, Any]:
-        return {
-            "experiment_name": self.experiment_name,
-            "dataset_name": self.dataset_name,
-            "best_model": self.best_model,
-            "timestamp": self.timestamp,
-            "results": self.results
-        }
+    
+    def generate_json_report(() -> Dict[str, Any]:
+        pass
 
     def generate_markdown_report(self) -> str:
         """Generate Markdown executive report"""

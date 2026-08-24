@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
 
+interface ABTestAnalysis {
+  control_mean: number;
+  variant_mean: number;
+  lift_percent: number;
+  p_value: number;
+  statistically_significant: boolean;
+  confidence_interval_control: [number, number];
+  confidence_interval_variant: [number, number];
+  recommendation: string;
+}
+
 export default function AdvancedAnalytics() {
   const [sampleSize, setSampleSize] = useState<number | null>(null);
   const [powerAnalysis, setPowerAnalysis] = useState<any>(null);
@@ -8,6 +19,7 @@ export default function AdvancedAnalytics() {
   const [sampleSizeInput, setSampleSizeInput] = useState(1000);
 
   const calculateSampleSize = () => {
+    // Client side preview calculation
     const zAlpha = 1.96;
     const zBeta = 0.84;
     const p1 = baselineRate;
@@ -27,130 +39,120 @@ export default function AdvancedAnalytics() {
   };
 
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-      <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '6px', background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-        Advanced Analytics & A/B Experimentation
-      </h1>
-      <p style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '32px' }}>
-        Statistical sample size sizing, power analysis, and sequential early-stopping test rules
-      </p>
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">Advanced Analytics & Experimentation</h1>
+        <p className="text-gray-600 mb-8">Statistical sample size sizing, power analysis, and sequential A/B testing</p>
 
-      {/* Sample Size Calculator Card */}
-      <div style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '14px', padding: '32px', marginBottom: '32px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#fff', marginBottom: '24px' }}>Sample Size Calculator</h2>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', marginBottom: '24px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', color: '#9ca3af', marginBottom: '8px', fontWeight: '500' }}>
-              Baseline Rate: <strong style={{ color: '#fff' }}>{(baselineRate * 100).toFixed(1)}%</strong>
-            </label>
-            <input
-              type="range"
-              min="0.01"
-              max="0.5"
-              step="0.01"
-              value={baselineRate}
-              onChange={(e) => setBaselineRate(parseFloat(e.target.value))}
-              style={{ width: '100%' }}
-            />
+        {/* Sample Size Calculator */}
+        <div className="bg-white rounded-lg shadow p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Sample Size Calculator</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Baseline Rate: {(baselineRate * 100).toFixed(1)}%
+              </label>
+              <input
+                type="range"
+                min="0.01"
+                max="0.5"
+                step="0.01"
+                value={baselineRate}
+                onChange={(e) => setBaselineRate(parseFloat(e.target.value))}
+                className="w-full"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Minimum Effect Size: {(effectSize * 100).toFixed(1)}%
+              </label>
+              <input
+                type="range"
+                min="0.01"
+                max="0.5"
+                step="0.01"
+                value={effectSize}
+                onChange={(e) => setEffectSize(parseFloat(e.target.value))}
+                className="w-full"
+              />
+            </div>
           </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', color: '#9ca3af', marginBottom: '8px', fontWeight: '500' }}>
-              Minimum Effect Size: <strong style={{ color: '#fff' }}>{(effectSize * 100).toFixed(1)}%</strong>
-            </label>
-            <input
-              type="range"
-              min="0.01"
-              max="0.5"
-              step="0.01"
-              value={effectSize}
-              onChange={(e) => setEffectSize(parseFloat(e.target.value))}
-              style={{ width: '100%' }}
-            />
-          </div>
+          <button
+            onClick={calculateSampleSize}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold"
+          >
+            Calculate Required Sample Size
+          </button>
+
+          {sampleSize && (
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-gray-900">
+                <span className="font-bold">Required samples per group:</span> {sampleSize.toLocaleString()}
+              </p>
+              <p className="text-gray-900 mt-2">
+                <span className="font-bold">Total samples needed:</span> {(sampleSize * 2).toLocaleString()}
+              </p>
+            </div>
+          )}
         </div>
 
-        <button
-          onClick={calculateSampleSize}
-          style={{
-            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '10px',
-            padding: '12px 24px',
-            fontWeight: '700',
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}
-        >
-          Calculate Required Sample Size
-        </button>
-
-        {sampleSize && (
-          <div style={{ marginTop: '24px', padding: '16px', backgroundColor: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '10px' }}>
-            <p style={{ color: '#34d399', fontSize: '15px' }}>
-              <strong>Required samples per group:</strong> {sampleSize.toLocaleString()}
-            </p>
-            <p style={{ color: '#34d399', fontSize: '15px', marginTop: '4px' }}>
-              <strong>Total samples needed:</strong> {(sampleSize * 2).toLocaleString()}
-            </p>
+        {/* Power Analysis */}
+        <div className="bg-white rounded-lg shadow p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Statistical Power Analysis</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sample Size per Group
+              </label>
+              <input
+                type="number"
+                value={sampleSizeInput}
+                onChange={(e) => setSampleSizeInput(parseInt(e.target.value) || 0)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Power Analysis Card */}
-      <div style={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '14px', padding: '32px' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#fff', marginBottom: '24px' }}>Statistical Power Analysis</h2>
-        
-        <div style={{ maxWidth: '320px', marginBottom: '24px' }}>
-          <label style={{ display: 'block', fontSize: '14px', color: '#9ca3af', marginBottom: '8px' }}>Sample Size per Group</label>
-          <input
-            type="number"
-            value={sampleSizeInput}
-            onChange={(e) => setSampleSizeInput(parseInt(e.target.value) || 0)}
-            style={{ width: '100%', backgroundColor: '#111827', border: '1px solid #374151', color: '#fff', borderRadius: '8px', padding: '10px 14px' }}
-          />
+          <button
+            onClick={calculatePower}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold"
+          >
+            Calculate Statistical Power
+          </button>
+
+          {powerAnalysis && (
+            <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">Statistical Power</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {(powerAnalysis.power * 100).toFixed(1)}%
+                </p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">Type II Error (β)</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {(powerAnalysis.beta * 100).toFixed(1)}%
+                </p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">Required Samples</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {(powerAnalysis.required_samples_per_group * 2).toLocaleString()}
+                </p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">Min Detectable Effect</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {(powerAnalysis.min_detectable_effect * 100).toFixed(2)}%
+                </p>
+              </div>
+            </div>
+          )}
         </div>
-
-        <button
-          onClick={calculatePower}
-          style={{
-            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '10px',
-            padding: '12px 24px',
-            fontWeight: '700',
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}
-        >
-          Calculate Statistical Power
-        </button>
-
-        {powerAnalysis && (
-          <div style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-            <div style={{ backgroundColor: '#111827', padding: '16px', borderRadius: '10px', border: '1px solid #374151' }}>
-              <p style={{ fontSize: '12px', color: '#9ca3af' }}>Statistical Power</p>
-              <p style={{ fontSize: '24px', fontWeight: '800', color: '#fff', marginTop: '4px' }}>
-                {(powerAnalysis.power * 100).toFixed(1)}%
-              </p>
-            </div>
-            <div style={{ backgroundColor: '#111827', padding: '16px', borderRadius: '10px', border: '1px solid #374151' }}>
-              <p style={{ fontSize: '12px', color: '#9ca3af' }}>Type II Error (β)</p>
-              <p style={{ fontSize: '24px', fontWeight: '800', color: '#fff', marginTop: '4px' }}>
-                {(powerAnalysis.beta * 100).toFixed(1)}%
-              </p>
-            </div>
-            <div style={{ backgroundColor: '#111827', padding: '16px', borderRadius: '10px', border: '1px solid #374151' }}>
-              <p style={{ fontSize: '12px', color: '#9ca3af' }}>Required Samples</p>
-              <p style={{ fontSize: '24px', fontWeight: '800', color: '#fff', marginTop: '4px' }}>
-                {(powerAnalysis.required_samples_per_group * 2).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

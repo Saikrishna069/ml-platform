@@ -1,30 +1,21 @@
+# Render Infrastructure-as-Code Manifest for 100% Free Hosting
 services:
-  # FastAPI Backend Service (Free Tier)
+  # Backend FastAPI Web Service
   - type: web
-    name: ml-platform-backend
+    name: ml-platform-api
     env: python
-    region: oregon
-    buildCommand: "cd backend && pip install -r requirements.txt"
-    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    region: singapore # or oregon, frankfurt, ohio
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: ENVIRONMENT
-        value: production
-      - key: DEBUG
-        value: "false"
+      - key: DATABASE_URL
+        sync: false # Set to Supabase Postgres URL
+      - key: REDIS_URL
+        sync: false # Set to Upstash Redis URL
       - key: SECRET_KEY
         generateValue: true
-      - key: DATABASE_URL
-        value: sqlite:///./app.db
       - key: ALLOWED_ORIGINS
         value: '["*"]'
-
-  # React Frontend Static Site (Free Tier)
-  - type: web
-    name: ml-platform-frontend
-    env: static
-    buildCommand: "cd frontend && npm install && npm run build"
-    staticPublishPath: "./frontend/dist"
-    routes:
-      - type: rewrite
-        source: "/*"
-        destination: "/index.html"
+      - key: ENVIRONMENT
+        value: "production"

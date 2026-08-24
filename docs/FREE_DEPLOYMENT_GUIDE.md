@@ -1,67 +1,95 @@
-# 🚀 100% Free Production Deployment Guide (Zero Cost Forever)
+# Mandatory Free GPU Real-World Deployment Guide (NVIDIA T4 GPU)
 
-This guide provides step-by-step instructions for deploying your **Enterprise ML Platform** to professional cloud platforms for **$0/month**.
-
----
-
-## 🌟 Architecture (Free Tier Stack)
-
-| Component | Platform | Free Features | Cost |
-|-----------|----------|---------------|------|
-| **Frontend** | [Vercel](https://vercel.com) | Global Edge CDN, Free SSL, Unlimited deploys | **$0/mo** |
-| **Backend API** | [Render](https://render.com) | Free Web Service, Automatic HTTPS, Python 3.11 | **$0/mo** |
-| **Database** | Render SQLite / PostgreSQL | Free tier storage & database connection | **$0/mo** |
+This guide walks you step-by-step through deploying the complete **ML Dataset Analyzer & MLOps Platform** for **100% FREE ($0/month)** with **MANDATORY NVIDIA T4 GPU Acceleration** on Hugging Face Spaces!
 
 ---
 
-## 🛠️ Step 1: Deploy Backend to Render (Free)
+## 🏗️ Mandatory Architecture (NVIDIA T4 GPU Powered)
 
-1. Push your project code to **GitHub**.
-2. Sign up / Log in to [Render.com](https://render.com).
-3. Click **New +** -> **Blueprints**.
-4. Connect your GitHub repository.
-5. Render will automatically detect [`render.yaml`](file:///c:/Users/RADHARAPU%20SAIKRISHNA/Downloads/datasets%20analysis/render.yaml) in the root directory.
-6. Click **Apply Blueprint**.
-7. Render will build and deploy your FastAPI backend automatically.
-8. Copy your live backend URL (e.g., `https://ml-platform-backend.onrender.com`).
-
----
-
-## ⚡ Step 2: Deploy Frontend to Vercel (Free)
-
-1. Sign up / Log in to [Vercel.com](https://vercel.com).
-2. Click **Add New...** -> **Project**.
-3. Import your GitHub repository.
-4. Set **Root Directory** to `frontend`.
-5. Under **Environment Variables**, add:
-   - Name: `VITE_API_URL`
-   - Value: `https://ml-platform-backend.onrender.com` (Your Render URL)
-6. Click **Deploy**.
-7. Vercel will build and assign your live domain (e.g., `https://ml-platform.vercel.app`).
-
----
-
-## 🔒 Verification & Live Check
-
-- **Frontend Live URL**: `https://ml-platform.vercel.app`
-- **Backend API Docs (Swagger)**: `https://ml-platform-backend.onrender.com/docs`
-- **Health Check**: `https://ml-platform-backend.onrender.com/health`
-
----
-
-## 🖥️ Local Live Test (Run Immediately on your machine)
-
-To run the full stack locally with a live hot-reload server right now:
-
-```bash
-# Terminal 1: Backend
-cd backend
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-# Terminal 2: Frontend
-cd frontend
-npm install
-npm run dev
+```
+┌───────────────────────────────────────────────────────────────────────┐
+│                     1. Frontend Hosting (Vercel)                      │
+│   Free Global CDN | Auto SSL | Custom Domain | Vite React SPA         │
+└──────────────────────────────────┬────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼────────────────────────────────────┐
+│      2. Mandatory GPU Backend (Hugging Face Spaces - NVIDIA T4)       │
+│   Free NVIDIA T4 GPU | CUDA Deep Learning Engine | FastAPI Container  │
+└──────────────────┬───────────────────────────────┬────────────────────┘
+                   │                               │
+┌──────────────────▼─────────────────┐   ┌─────────▼────────────────────┐
+│  3. Database (Supabase / Neon)     │   │  4. Cache & Queue (Upstash)  │
+│  Free PostgreSQL (500MB+ Storage)  │   │  Free Serverless Redis       │
+└────────────────────────────────────┘   └──────────────────────────────┘
 ```
 
-Open your browser at `http://localhost:5173`.
+---
+
+## 📋 Mandatory Step-by-Step Deployment (15 Minutes)
+
+### STEP 1: Set Up Free PostgreSQL Database (Supabase)
+1. Go to **[https://supabase.com](https://supabase.com)** and sign in with GitHub.
+2. Click **New Project**, name it `ml-platform`, set a strong database password, and click **Create**.
+3. Go to **Project Settings → Database → Connection String → URI**, and copy your connection string:
+   - *Example*: `postgresql://postgres:YOUR_PASSWORD@db.abcdefghijk.supabase.co:5432/postgres`
+
+---
+
+### STEP 2: Set Up Free Redis Cache (Upstash)
+1. Go to **[https://upstash.com](https://upstash.com)** and sign in with GitHub.
+2. Click **Create Database** → Select **Redis** → Name: `ml-platform-redis`.
+3. Copy the **redis://** or **rediss://** connection URL under *Connect your database*.
+
+---
+
+### STEP 3: Push Project to GitHub
+Open PowerShell in `C:\Users\RADHARAPU SAIKRISHNA\Downloads\datasets analysis` and run:
+```powershell
+git init
+git add .
+git commit -m "Deploy ML platform with Hugging Face GPU backend"
+```
+Create a new GitHub repository at **[https://github.com/new](https://github.com/new)** (`ml-platform`) and push your code:
+```powershell
+git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/ml-platform.git
+git branch -M main
+git push -u origin main
+```
+
+---
+
+### STEP 4: Deploy Backend to Hugging Face Spaces (NVIDIA T4 GPU - Mandatory)
+
+1. Go to **[https://huggingface.co/spaces](https://huggingface.co/spaces)** and click **Create new Space**.
+2. Fill in the details:
+   - **Space Name**: `ml-platform-backend`
+   - **License**: `mit`
+   - **Space SDK**: **Docker** (Blank)
+   - **Space Hardware**: Select **T4 Small (Free)** *(NVIDIA T4 16GB GPU)*.
+3. Click **Create Space**.
+4. Go to **Space Settings → Variables and Secrets**:
+   - Add Secret: `DATABASE_URL` = *(Your Supabase connection string from Step 1)*
+   - Add Secret: `REDIS_URL` = *(Your Upstash connection string from Step 2)*
+   - Add Secret: `SECRET_KEY` = `my-super-secret-production-key-12345`
+   - Add Secret: `ALLOWED_ORIGINS` = `["*"]`
+5. Connect your GitHub repository or push your repository code directly to the Space repository.
+6. Hugging Face Spaces will automatically build the `Dockerfile` and launch your backend with **NVIDIA T4 GPU acceleration** on port 7860!
+   - Your GPU API endpoint will be: `https://<YOUR_HF_USERNAME>-ml-platform-backend.hf.space`
+
+---
+
+### STEP 5: Deploy Frontend UI to Vercel
+1. Go to **[https://vercel.com](https://vercel.com)** and sign in with GitHub.
+2. Click **Add New... → Project** → Import your `ml-platform` repository.
+3. Set **Root Directory** to `frontend`.
+4. Framework Preset: `Vite`, Build Command: `npm run build`, Output Directory: `dist`.
+5. Under Environment Variables (optional) or in `vercel.json`, set your Hugging Face Space backend URL.
+6. Click **Deploy**!
+
+---
+
+## 🎯 Verification
+
+1. Open your Vercel URL (`https://ml-platform.vercel.app`).
+2. Test deep learning classification or computer vision feature extractions.
+3. Your platform is now running live on an **NVIDIA T4 GPU for 100% FREE ($0/month)**!
