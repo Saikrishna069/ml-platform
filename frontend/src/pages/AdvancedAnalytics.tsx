@@ -1,5 +1,23 @@
 import React, { useState } from 'react';
 
+// Pure JavaScript approximation for Error Function erf(x) to prevent runtime TypeError crash
+function erf(x: number): number {
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+
+  const sign = x < 0 ? -1 : 1;
+  const absX = Math.abs(x);
+
+  const t = 1.0 / (1.0 + p * absX);
+  const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX);
+
+  return sign * y;
+}
+
 export default function AdvancedAnalytics() {
   // 1. Sample Size Sizing Controls
   const [baselineConv, setBaselineConv] = useState(5.0); // %
@@ -15,8 +33,8 @@ export default function AdvancedAnalytics() {
   const [variantB_conv, setVariantB_conv] = useState(695); // 5.58%
 
   // Calculated Sample Size Metrics
-  const p1 = baselineConv / 100;
-  const p2 = p1 * (1 + mdePct / 100);
+  const p1 = Math.max(0.001, Math.min(0.999, baselineConv / 100));
+  const p2 = Math.max(0.001, Math.min(0.999, p1 * (1 + mdePct / 100)));
   const delta = Math.abs(p2 - p1);
   const pAvg = (p1 + p2) / 2;
 
@@ -24,11 +42,11 @@ export default function AdvancedAnalytics() {
   const zAlpha = alpha === 0.01 ? 2.576 : alpha === 0.05 ? 1.96 : 1.645;
   const zBeta = power === 0.90 ? 1.282 : power === 0.85 ? 1.036 : 0.842;
 
-  const requiredSamplePerVariant = Math.ceil(
+  const requiredSamplePerVariant = delta > 0 ? Math.ceil(
     (2 * pAvg * (1 - pAvg) * Math.pow(zAlpha + zBeta, 2)) / Math.pow(delta, 2)
-  );
+  ) : 1000;
   const totalRequiredSamples = requiredSamplePerVariant * 2;
-  const estimatedDays = Math.ceil(totalRequiredSamples / dailyTraffic);
+  const estimatedDays = Math.max(1, Math.ceil(totalRequiredSamples / (dailyTraffic || 1)));
 
   // Sequential A/B Test Results
   const rateA = variantA_users > 0 ? (variantA_conv / variantA_users) : 0;
@@ -36,12 +54,16 @@ export default function AdvancedAnalytics() {
   const relativeLift = rateA > 0 ? ((rateB - rateA) / rateA) * 100 : 0;
 
   // Two-proportion Z-test p-value calculation
-  const pooledP = (variantA_conv + variantB_conv) / (variantA_users + variantB_users);
-  const sePool = Math.sqrt(pooledP * (1 - pooledP) * (1 / variantA_users + 1 / variantB_users));
+  const totalConv = variantA_conv + variantB_conv;
+  const totalUsers = variantA_users + variantB_users;
+  const pooledP = totalUsers > 0 ? totalConv / totalUsers : 0.05;
+  const sePool = (totalUsers > 0 && variantA_users > 0 && variantB_users > 0)
+    ? Math.sqrt(pooledP * (1 - pooledP) * (1 / variantA_users + 1 / variantB_users))
+    : 0.01;
   const zStat = sePool > 0 ? (rateB - rateA) / sePool : 0;
 
-  // Normal CDF approximation for p-value
-  const pValue = parseFloat((2 * (1 - (0.5 * (1 + Math.erf(Math.abs(zStat) / Math.sqrt(2)))))).toFixed(4));
+  // Safe p-value using pure erf function
+  const pValue = parseFloat((2 * (1 - (0.5 * (1 + erf(Math.abs(zStat) / Math.sqrt(2)))))) .toFixed(4));
   const isStatSig = pValue < alpha;
 
   return (
