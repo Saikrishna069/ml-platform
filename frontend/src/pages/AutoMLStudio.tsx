@@ -131,7 +131,7 @@ export default function AutoMLStudio() {
     },
     {
       id: 8,
-      name: 'Support Vector Machine (SVC)',
+      name: 'Support Vector Machine (SVM)',
       category: 'Linear/Kernel',
       accuracy: 0.920, f1_score: 0.914, precision: 0.918, recall: 0.910, roc_auc: 0.955, training_time_s: 0.6,
       status: 'completed', tp: 67, fp: 7, tn: 71, fn: 5,
@@ -290,7 +290,7 @@ export default function AutoMLStudio() {
         { name: 'LightGBM Classifier', category: 'Ensemble' as const, baseAcc: 0.930 },
         { name: 'Extra Trees Classifier', category: 'Tree-based' as const, baseAcc: 0.925 },
         { name: 'Gradient Boosting Classifier', category: 'Ensemble' as const, baseAcc: 0.920 },
-        { name: 'Support Vector Machine (SVC)', category: 'Linear/Kernel' as const, baseAcc: 0.915 },
+        { name: 'Support Vector Machine (SVM)', category: 'Linear/Kernel' as const, baseAcc: 0.915 },
         { name: 'Multi-Layer Perceptron (MLP Neural Net)', category: 'Neural Net' as const, baseAcc: 0.910 },
         { name: 'K-Nearest Neighbors (KNN)', category: 'Linear/Kernel' as const, baseAcc: 0.905 },
         { name: 'AdaBoost Classifier', category: 'Ensemble' as const, baseAcc: 0.900 },
