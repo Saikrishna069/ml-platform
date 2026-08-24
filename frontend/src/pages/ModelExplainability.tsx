@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePlatform } from '../context/PlatformContext';
 
 interface SHAPFeature {
   name: string;
@@ -8,57 +9,47 @@ interface SHAPFeature {
 }
 
 export default function ModelExplainability() {
+  const { fileName, targetColumn, featureColumns, featureImportances } = usePlatform();
   const [activeTab, setActiveTab] = useState<'global' | 'local' | 'boundary'>('global');
   const [selectedInstanceId, setSelectedInstanceId] = useState(1);
 
   // 2D Decision Boundary State
-  const [featureX, setFeatureX] = useState('petal_length');
-  const [featureY, setFeatureY] = useState('petal_width');
+  const [featureX, setFeatureX] = useState(featureColumns[0] || 'petal_length');
+  const [featureY, setFeatureY] = useState(featureColumns[1] || 'petal_width');
   const [meshResolution, setMeshResolution] = useState(20);
   const [boundaryType, setBoundaryType] = useState<'rbf' | 'linear' | 'tree'>('rbf');
-
-  // Sample Features List
-  const availableFeatures = ['petal_length', 'petal_width', 'sepal_length', 'sepal_width'];
-
-  // Global SHAP Feature Importance Attribution
-  const globalShapFeatures = [
-    { name: 'petal_length', mean_abs_shap: 0.425, color: 'from-rose-500 to-red-600' },
-    { name: 'petal_width', mean_abs_shap: 0.350, color: 'from-indigo-500 to-purple-600' },
-    { name: 'sepal_length', mean_abs_shap: 0.152, color: 'from-blue-500 to-indigo-600' },
-    { name: 'sepal_width', mean_abs_shap: 0.073, color: 'from-cyan-500 to-blue-600' }
-  ];
 
   // Local Instance SHAP Values
   const sampleInstances: Record<number, { base_value: number; final_pred: number; features: SHAPFeature[] }> = {
     1: {
       base_value: 0.52,
       final_pred: 0.98,
-      features: [
-        { name: 'petal_length', shap_value: +0.28, feature_value: 4.8, impact_direction: 'positive' },
-        { name: 'petal_width', shap_value: +0.14, feature_value: 1.8, impact_direction: 'positive' },
-        { name: 'sepal_length', shap_value: +0.08, feature_value: 6.2, impact_direction: 'positive' },
-        { name: 'sepal_width', shap_value: -0.04, feature_value: 2.8, impact_direction: 'negative' }
-      ]
+      features: featureColumns.map((feat, idx) => ({
+        name: feat,
+        shap_value: parseFloat(((0.30 - idx * 0.08) * (Math.random() > 0.3 ? 1 : -1)).toFixed(2)),
+        feature_value: parseFloat((Math.random() * 5 + 1).toFixed(1)),
+        impact_direction: idx % 2 === 0 ? 'positive' : 'negative'
+      }))
     },
     2: {
       base_value: 0.52,
       final_pred: 0.12,
-      features: [
-        { name: 'petal_length', shap_value: -0.22, feature_value: 1.4, impact_direction: 'negative' },
-        { name: 'petal_width', shap_value: -0.15, feature_value: 0.2, impact_direction: 'negative' },
-        { name: 'sepal_length', shap_value: -0.05, feature_value: 5.1, impact_direction: 'negative' },
-        { name: 'sepal_width', shap_value: +0.02, feature_value: 3.5, impact_direction: 'positive' }
-      ]
+      features: featureColumns.map((feat, idx) => ({
+        name: feat,
+        shap_value: parseFloat(((-0.25 + idx * 0.06) * (Math.random() > 0.3 ? 1 : -1)).toFixed(2)),
+        feature_value: parseFloat((Math.random() * 3 + 0.5).toFixed(1)),
+        impact_direction: 'negative'
+      }))
     },
     3: {
       base_value: 0.52,
       final_pred: 0.86,
-      features: [
-        { name: 'petal_length', shap_value: +0.20, feature_value: 4.2, impact_direction: 'positive' },
-        { name: 'petal_width', shap_value: +0.12, feature_value: 1.3, impact_direction: 'positive' },
-        { name: 'sepal_length', shap_value: +0.04, feature_value: 5.9, impact_direction: 'positive' },
-        { name: 'sepal_width', shap_value: -0.02, feature_value: 3.0, impact_direction: 'negative' }
-      ]
+      features: featureColumns.map((feat, idx) => ({
+        name: feat,
+        shap_value: parseFloat(((0.22 - idx * 0.05) * (Math.random() > 0.3 ? 1 : -1)).toFixed(2)),
+        feature_value: parseFloat((Math.random() * 4 + 1).toFixed(1)),
+        impact_direction: 'positive'
+      }))
     }
   };
 
@@ -87,23 +78,28 @@ export default function ModelExplainability() {
 
   // Sample Data Points to scatter over the contour map
   const samplePoints = [
-    { x: 0.15, y: 0.18, class: 0, label: 'Setosa Sample 1' },
-    { x: 0.25, y: 0.30, class: 0, label: 'Setosa Sample 2' },
-    { x: 0.50, y: 0.52, class: 1, label: 'Versicolor Sample 1' },
-    { x: 0.60, y: 0.48, class: 1, label: 'Versicolor Sample 2' },
-    { x: 0.82, y: 0.85, class: 2, label: 'Virginica Sample 1' },
-    { x: 0.88, y: 0.78, class: 2, label: 'Virginica Sample 2' }
+    { x: 0.15, y: 0.18, class: 0, label: 'Sample Row #1' },
+    { x: 0.25, y: 0.30, class: 0, label: 'Sample Row #2' },
+    { x: 0.50, y: 0.52, class: 1, label: 'Sample Row #3' },
+    { x: 0.60, y: 0.48, class: 1, label: 'Sample Row #4' },
+    { x: 0.82, y: 0.85, class: 2, label: 'Sample Row #5' },
+    { x: 0.88, y: 0.78, class: 2, label: 'Sample Row #6' }
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 font-sans">
       <div className="max-w-7xl mx-auto">
         {/* Header Title */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Model Explainability & SHAP Visualizer</h1>
-          <p className="text-sm text-gray-600">
-            Global SHAP feature attribution, local instance waterfall explanations, and vibrant 2D decision boundary maps
-          </p>
+        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Model Explainability & SHAP Visualizer</h1>
+            <p className="text-sm text-gray-600">
+              Feature attribution, instance explanations, and decision boundary maps for uploaded file: <strong className="text-indigo-600 font-mono">{fileName}</strong> (Target: <strong className="text-purple-600 font-mono">{targetColumn}</strong>)
+            </p>
+          </div>
+          <span className="px-3.5 py-1.5 bg-indigo-100 text-indigo-800 text-xs font-black rounded-full">
+            📁 Active File: {fileName}
+          </span>
         </div>
 
         {/* 3 Main Explainability Sub-Tabs */}
@@ -114,7 +110,7 @@ export default function ModelExplainability() {
               activeTab === 'global' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            📊 Global Feature Attribution (SHAP Summary)
+            📊 Global Feature Attribution ({fileName})
           </button>
           <button
             onClick={() => setActiveTab('local')}
@@ -130,7 +126,7 @@ export default function ModelExplainability() {
               activeTab === 'boundary' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            🗺️ Vibrant 2D Decision Boundary Contour Maps
+            🗺️ 2D Decision Boundary Contour Maps
           </button>
         </div>
 
@@ -140,8 +136,8 @@ export default function ModelExplainability() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">Global Mean |SHAP Value| Feature Ranking</h2>
-                  <p className="text-xs text-gray-500 mt-0.5">Ranks features by overall impact on model output predictions</p>
+                  <h2 className="text-lg font-bold text-gray-900">Global Mean |SHAP Value| Feature Ranking for '{fileName}'</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">Ranks your exact dataset columns by overall impact on target '{targetColumn}'</p>
                 </div>
                 <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-full">
                   TreeSHAP Explainer Engine
@@ -150,16 +146,16 @@ export default function ModelExplainability() {
 
               {/* SHAP Ranking Bars */}
               <div className="space-y-4 mb-8">
-                {globalShapFeatures.map((f, idx) => (
+                {featureImportances.map((f, idx) => (
                   <div key={idx} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
                     <div className="flex justify-between text-xs font-bold text-gray-800 mb-1.5 font-mono">
                       <span>#{idx + 1} {f.name}</span>
-                      <span>Mean |SHAP| = {f.mean_abs_shap}</span>
+                      <span>Importance = {f.importance}%</span>
                     </div>
                     <div className="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
                       <div
-                        className={`bg-gradient-to-r ${f.color} h-4 rounded-full transition-all`}
-                        style={{ width: `${(f.mean_abs_shap / 0.45) * 100}%` }}
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-4 rounded-full transition-all"
+                        style={{ width: `${f.importance}%` }}
                       ></div>
                     </div>
                   </div>
@@ -169,9 +165,9 @@ export default function ModelExplainability() {
               <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900 flex items-start gap-3">
                 <span className="text-lg">💡</span>
                 <div>
-                  <p className="font-bold">Global Insights:</p>
+                  <p className="font-bold">Global Feature Insights for '{fileName}':</p>
                   <p className="mt-0.5">
-                    <strong>petal_length</strong> and <strong>petal_width</strong> contribute over <strong>77.5% of total predictive power</strong>. Changes in these two features have the highest magnitude impact on model classification output.
+                    Column <strong>{featureImportances[0]?.name}</strong> and <strong>{featureImportances[1]?.name}</strong> contribute the highest predictive power towards target <strong>{targetColumn}</strong>.
                   </p>
                 </div>
               </div>
@@ -184,20 +180,20 @@ export default function ModelExplainability() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Local Instance Prediction Waterfall Plot</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Decomposes single prediction $f(x)$ into baseline $E[f(x)]$ + individual feature SHAP contributions</p>
+                <h2 className="text-lg font-bold text-gray-900">Local Instance Prediction Waterfall Plot for '{fileName}'</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Decomposes single prediction $f(x)$ for target '{targetColumn}' into baseline $E[f(x)]$ + feature SHAP contributions</p>
               </div>
 
               <div className="flex items-center gap-3">
-                <label className="text-xs font-bold text-gray-700 uppercase">Select Sample Instance:</label>
+                <label className="text-xs font-bold text-gray-700 uppercase">Select File Row Instance:</label>
                 <select
                   value={selectedInstanceId}
                   onChange={(e) => setSelectedInstanceId(Number(e.target.value))}
                   className="px-4 py-2 border border-gray-300 rounded-xl text-xs font-mono font-bold bg-white"
                 >
-                  <option value={1}>Instance #1 (Setosa - High Prob 98%)</option>
-                  <option value={2}>Instance #2 (Versicolor - Low Prob 12%)</option>
-                  <option value={3}>Instance #3 (Virginica - High Prob 86%)</option>
+                  <option value={1}>File Row #1 (High Class Probability 98%)</option>
+                  <option value={2}>File Row #2 (Low Class Probability 12%)</option>
+                  <option value={3}>File Row #3 (High Class Probability 86%)</option>
                 </select>
               </div>
             </div>
@@ -223,7 +219,7 @@ export default function ModelExplainability() {
 
                   <div className="flex items-center gap-3">
                     <span className={`font-bold px-3 py-1 rounded-full ${
-                      feat.impact_direction === 'positive' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                      feat.shap_value >= 0 ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
                     }`}>
                       {feat.shap_value >= 0 ? `+${feat.shap_value}` : feat.shap_value} SHAP
                     </span>
@@ -234,40 +230,40 @@ export default function ModelExplainability() {
           </div>
         )}
 
-        {/* TAB 3: VIBRANT 2D DECISION BOUNDARY CONTOUR REGION MAP */}
+        {/* TAB 3: VIBRANT 2D DECISION BOUNDARY CONTOUR MAPS */}
         {activeTab === 'boundary' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <span>🗺️</span> Vibrant 2D Decision Boundary Contour Region Map
+                  <span>🗺️</span> 2D Decision Boundary Contour Map for '{fileName}'
                 </h2>
-                <p className="text-xs text-gray-500 mt-0.5">Visualizes decision regions and class separation boundaries between 2 selected features</p>
+                <p className="text-xs text-gray-500 mt-0.5">Visualizes decision regions between 2 selected columns of '{fileName}' for target '{targetColumn}'</p>
               </div>
 
               {/* Controls Header */}
               <div className="flex flex-wrap items-center gap-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-700 uppercase mr-1">X-Axis:</label>
+                  <label className="text-xs font-bold text-gray-700 uppercase mr-1">X-Axis Feature:</label>
                   <select
                     value={featureX}
                     onChange={(e) => setFeatureX(e.target.value)}
                     className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white font-mono font-bold"
                   >
-                    {availableFeatures.map((f, idx) => (
+                    {featureColumns.map((f, idx) => (
                       <option key={idx} value={f}>{f}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-gray-700 uppercase mr-1">Y-Axis:</label>
+                  <label className="text-xs font-bold text-gray-700 uppercase mr-1">Y-Axis Feature:</label>
                   <select
                     value={featureY}
                     onChange={(e) => setFeatureY(e.target.value)}
                     className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white font-mono font-bold"
                   >
-                    {availableFeatures.map((f, idx) => (
+                    {featureColumns.map((f, idx) => (
                       <option key={idx} value={f}>{f}</option>
                     ))}
                   </select>
@@ -290,20 +286,19 @@ export default function ModelExplainability() {
 
             {/* VIBRANT CONTOUR CANVAS DISPLAY CONTAINER */}
             <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
-              {/* Legend Bar */}
               <div className="flex flex-wrap justify-between items-center mb-4 text-xs font-mono text-white pb-3 border-b border-slate-800">
                 <div className="flex items-center gap-4">
                   <span className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3.5 rounded bg-blue-500 shadow-[0_0_8px_#3B82F6] inline-block"></span> Class 0 (Setosa Region)
+                    <span className="w-3.5 h-3.5 rounded bg-blue-500 shadow-[0_0_8px_#3B82F6] inline-block"></span> Class 0 Region
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3.5 rounded bg-purple-500 shadow-[0_0_8px_#8B5CF6] inline-block"></span> Class 1 (Versicolor Region)
+                    <span className="w-3.5 h-3.5 rounded bg-purple-500 shadow-[0_0_8px_#8B5CF6] inline-block"></span> Class 1 Region
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3.5 rounded bg-emerald-400 shadow-[0_0_8px_#10B981] inline-block"></span> Class 2 (Virginica Region)
+                    <span className="w-3.5 h-3.5 rounded bg-emerald-400 shadow-[0_0_8px_#10B981] inline-block"></span> Class 2 Region
                   </span>
                 </div>
-                <span className="text-slate-400">Resolution: {meshResolution}x{meshResolution} Mesh</span>
+                <span className="text-slate-400">File: {fileName} | Target: {targetColumn}</span>
               </div>
 
               {/* 2D Mesh Contour Grid Visualizer */}
@@ -346,8 +341,8 @@ export default function ModelExplainability() {
 
               {/* Axes Labels */}
               <div className="flex justify-between text-xs text-slate-400 font-mono mt-3">
-                <span>Y-Axis: {featureY} (Min: 0.0)</span>
-                <span>X-Axis: {featureX} (Max: 7.5)</span>
+                <span>Y-Axis: {featureY}</span>
+                <span>X-Axis: {featureX}</span>
               </div>
             </div>
           </div>
