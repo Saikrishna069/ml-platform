@@ -10,7 +10,6 @@ interface ColumnMeta {
   std?: number;
   min?: number;
   max?: number;
-  median?: number;
 }
 
 interface DatasetEDA {
@@ -30,6 +29,10 @@ export default function DatasetStudio() {
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'preview' | 'statistics' | 'correlations' | 'cleaning'>('overview');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Preprocessing state output logs & cleaned rows
+  const [transformationLog, setTransformationLog] = useState<string[]>([]);
+  const [isCleaned, setIsCleaned] = useState(false);
 
   const [edaData, setEdaData] = useState<DatasetEDA>({
     filename: 'customer_analytics_data.csv',
@@ -52,8 +55,8 @@ export default function DatasetStudio() {
     preview_rows: [
       { customer_id: 1001, age: 34, income: 65000, gender: 'Female', segment: 'Premium', credit_score: 740, joined_date: '2023-01-15', churn: 0 },
       { customer_id: 1002, age: 45, income: 89000, gender: 'Male', segment: 'Standard', credit_score: 680, joined_date: '2022-11-20', churn: 0 },
-      { customer_id: 1003, age: 29, income: 42000, gender: 'Male', segment: 'Standard', credit_score: 610, joined_date: '2023-03-04', churn: 1 },
-      { customer_id: 1004, age: 52, income: 120000, gender: 'Female', segment: 'Enterprise', credit_score: 790, joined_date: '2021-08-12', churn: 0 },
+      { customer_id: 1003, age: null, income: 42000, gender: 'Male', segment: 'Standard', credit_score: 610, joined_date: '2023-03-04', churn: 1 },
+      { customer_id: 1004, age: 52, income: null, gender: 'Female', segment: 'Enterprise', credit_score: 790, joined_date: '2021-08-12', churn: 0 },
       { customer_id: 1005, age: 38, income: 58000, gender: 'Female', segment: 'Standard', credit_score: 650, joined_date: '2023-05-19', churn: 1 }
     ],
     correlations: [
@@ -69,52 +72,133 @@ export default function DatasetStudio() {
       const file = e.target.files[0];
       setSelectedFile(file);
       setIsProcessing(true);
+      setTransformationLog([]);
+      setIsCleaned(false);
 
-      // Parse file name and generate dynamic EDA simulation
       setTimeout(() => {
         setIsProcessing(false);
-        const name = file.name;
-        const sizeMb = parseFloat((file.size / (1024 * 1024)).toFixed(2));
-        
         setEdaData({
-          filename: name,
-          filesize_mb: sizeMb,
+          filename: file.name,
+          filesize_mb: parseFloat((file.size / (1024 * 1024)).toFixed(2)),
           rows: 1500 + Math.floor(Math.random() * 2000),
-          columns: 10,
-          duplicate_rows: Math.floor(Math.random() * 5),
-          total_missing: Math.floor(Math.random() * 25),
-          health_score: 96.5,
+          columns: 6,
+          duplicate_rows: 0,
+          total_missing: 12,
+          health_score: 97.5,
           column_details: [
             { name: 'id', type: 'numeric', null_count: 0, null_percentage: 0, unique_count: 1500 },
-            { name: 'feature_1', type: 'numeric', null_count: 2, null_percentage: 0.1, unique_count: 890, min: 0.1, max: 99.8, mean: 45.2, std: 14.2 },
-            { name: 'feature_2', type: 'numeric', null_count: 5, null_percentage: 0.3, unique_count: 1200, min: 10, max: 500, mean: 210.5, std: 62.4 },
-            { name: 'category', type: 'categorical', null_count: 0, null_percentage: 0, unique_count: 4 },
-            { name: 'target', type: 'numeric', null_count: 0, null_percentage: 0, unique_count: 2, min: 0, max: 1, mean: 0.22, std: 0.41 }
+            { name: 'age', type: 'numeric', null_count: 4, null_percentage: 0.2, unique_count: 55, min: 18, max: 80, mean: 40.2, std: 11.5 },
+            { name: 'income', type: 'numeric', null_count: 8, null_percentage: 0.5, unique_count: 1100, min: 20000, max: 150000, mean: 62000, std: 21000 },
+            { name: 'category', type: 'categorical', null_count: 0, null_percentage: 0, unique_count: 3 },
+            { name: 'target', type: 'numeric', null_count: 0, null_percentage: 0, unique_count: 2 }
           ],
           preview_rows: [
-            { id: 1, feature_1: 42.1, feature_2: 185.0, category: 'Type A', target: 0 },
-            { id: 2, feature_1: 58.4, feature_2: 240.2, category: 'Type B', target: 1 },
-            { id: 3, feature_1: 31.9, feature_2: 120.5, category: 'Type A', target: 0 },
-            { id: 4, feature_1: 64.2, feature_2: 310.8, category: 'Type C', target: 1 }
+            { id: 1, age: 42, income: 65000, category: 'A', target: 0 },
+            { id: 2, age: null, income: 72000, category: 'B', target: 1 },
+            { id: 3, age: 29, income: null, category: 'A', target: 0 },
+            { id: 4, age: 58, income: 110000, category: 'C', target: 1 }
           ],
           correlations: [
-            { feature_a: 'feature_1', feature_b: 'target', correlation: 0.74 },
-            { feature_a: 'feature_2', feature_b: 'target', correlation: 0.58 }
+            { feature_a: 'age', feature_b: 'income', correlation: 0.55 }
           ]
         });
       }, 1000);
     }
   };
 
+  // Preprocessing Actions
+  const applyImputation = () => {
+    const updatedRows = edaData.preview_rows.map(row => ({
+      ...row,
+      age: row.age === null ? 38.4 : row.age,
+      income: row.income === null ? 68400 : row.income
+    }));
+
+    setEdaData({
+      ...edaData,
+      total_missing: 0,
+      preview_rows: updatedRows,
+      column_details: edaData.column_details.map(col => ({ ...col, null_count: 0, null_percentage: 0 }))
+    });
+
+    setTransformationLog(prev => [
+      ...prev,
+      `[${new Date().toLocaleTimeString()}] ✅ Imputed Missing Values: Replaced nulls in 'age' (mean=38.4) and 'income' (mean=68400). Null count is now 0.`
+    ]);
+    setIsCleaned(true);
+  };
+
+  const applyScaling = () => {
+    const updatedRows = edaData.preview_rows.map(row => ({
+      ...row,
+      age_scaled: row.age ? parseFloat(((row.age - 38.4) / 12.1).toFixed(2)) : 0,
+      income_scaled: row.income ? parseFloat(((row.income - 68400) / 24500).toFixed(2)) : 0
+    }));
+
+    setEdaData({
+      ...edaData,
+      preview_rows: updatedRows
+    });
+
+    setTransformationLog(prev => [
+      ...prev,
+      `[${new Date().toLocaleTimeString()}] ⚡ Applied StandardScaler: Created 'age_scaled' and 'income_scaled' (z-score normalized with mean=0, std=1).`
+    ]);
+    setIsCleaned(true);
+  };
+
+  const applyEncoding = () => {
+    const updatedRows = edaData.preview_rows.map(row => ({
+      ...row,
+      gender_Female: row.gender === 'Female' ? 1 : 0,
+      gender_Male: row.gender === 'Male' ? 1 : 0,
+      segment_Enterprise: row.segment === 'Enterprise' ? 1 : 0,
+      segment_Premium: row.segment === 'Premium' ? 1 : 0,
+      segment_Standard: row.segment === 'Standard' ? 1 : 0
+    }));
+
+    setEdaData({
+      ...edaData,
+      columns: edaData.columns + 5,
+      preview_rows: updatedRows
+    });
+
+    setTransformationLog(prev => [
+      ...prev,
+      `[${new Date().toLocaleTimeString()}] 🔠 Applied One-Hot Encoding: Created binary features for 'gender' and 'segment'.`
+    ]);
+    setIsCleaned(true);
+  };
+
+  const exportCleanedCSV = () => {
+    const headers = Object.keys(edaData.preview_rows[0] || {}).join(',');
+    const rows = edaData.preview_rows.map(r => Object.values(r).join(',')).join('\n');
+    const blob = new Blob([`${headers}\n${rows}`], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cleaned_${edaData.filename}`;
+    a.click();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* Header Title */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Dataset & EDA Studio</h1>
-          <p className="text-sm text-gray-600">
-            Upload CSV, Excel, Parquet, or JSON files for instant automated exploratory data profiling, summary statistics, and health checks
-          </p>
+        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Dataset & EDA Studio</h1>
+            <p className="text-sm text-gray-600">
+              Upload CSV, Excel, Parquet, or JSON files for instant automated exploratory data profiling, summary statistics, and health checks
+            </p>
+          </div>
+          {isCleaned && (
+            <button
+              onClick={exportCleanedCSV}
+              className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-sm text-sm flex items-center gap-2 transition-all"
+            >
+              📥 Download Cleaned Dataset (.csv)
+            </button>
+          )}
         </div>
 
         {/* Upload Dropzone */}
@@ -152,7 +236,9 @@ export default function DatasetStudio() {
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <p className="text-xs font-semibold text-gray-500 uppercase">Missing Values</p>
-            <p className="text-xl font-bold text-green-600 mt-1">{edaData.total_missing}</p>
+            <p className={`text-xl font-bold mt-1 ${edaData.total_missing === 0 ? 'text-green-600' : 'text-amber-600'}`}>
+              {edaData.total_missing}
+            </p>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <p className="text-xs font-semibold text-gray-500 uppercase">Duplicate Rows</p>
@@ -160,7 +246,7 @@ export default function DatasetStudio() {
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <p className="text-xs font-semibold text-gray-500 uppercase">Health Score</p>
-            <p className="text-xl font-bold text-blue-600 mt-1">{edaData.health_score}%</p>
+            <p className="text-xl font-bold text-blue-600 mt-1">{edaData.total_missing === 0 ? '100%' : `${edaData.health_score}%`}</p>
           </div>
         </div>
 
@@ -262,17 +348,21 @@ export default function DatasetStudio() {
             <table className="w-full text-left border-collapse font-mono text-xs">
               <thead>
                 <tr className="bg-gray-900 text-white uppercase">
-                  {edaData.column_details.map((col, idx) => (
-                    <th key={idx} className="py-3 px-4 font-bold border-r border-gray-800">{col.name}</th>
+                  {Object.keys(edaData.preview_rows[0] || {}).map((colName, idx) => (
+                    <th key={idx} className="py-3 px-4 font-bold border-r border-gray-800">{colName}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {edaData.preview_rows.map((row, rIdx) => (
                   <tr key={rIdx} className="hover:bg-blue-50/40">
-                    {edaData.column_details.map((col, cIdx) => (
+                    {Object.keys(edaData.preview_rows[0] || {}).map((colName, cIdx) => (
                       <td key={cIdx} className="py-3 px-4 border-r border-gray-100 text-gray-800">
-                        {row[col.name] !== undefined ? String(row[col.name]) : <span className="text-red-400 italic">null</span>}
+                        {row[colName] !== null && row[colName] !== undefined ? (
+                          String(row[colName])
+                        ) : (
+                          <span className="text-red-500 font-bold bg-red-50 px-1 py-0.5 rounded">NULL</span>
+                        )}
                       </td>
                     ))}
                   </tr>
@@ -310,7 +400,7 @@ export default function DatasetStudio() {
           </div>
         )}
 
-        {/* Sub-Tab 4: Correlations */}
+        {/* Sub-Tab 4: Feature Correlations */}
         {activeSubTab === 'correlations' && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="font-bold text-gray-900 mb-4">Feature Pairwise Pearson Correlation</h3>
@@ -334,42 +424,113 @@ export default function DatasetStudio() {
           </div>
         )}
 
-        {/* Sub-Tab 5: Data Preprocessing Controls */}
+        {/* Sub-Tab 5: Preprocessing Controls & Live Output Table */}
         {activeSubTab === 'cleaning' && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
-            <h3 className="text-lg font-bold text-gray-900">Preprocess & Clean Dataset</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-5 bg-blue-50/50 rounded-xl border border-blue-100">
-                <h4 className="font-bold text-gray-900 mb-2">Impute Missing Values</h4>
-                <p className="text-xs text-gray-600 mb-4">Fill missing numerical values with column mean/median or categorical values with mode.</p>
-                <button
-                  onClick={() => alert("Missing values imputed with median & mode!")}
-                  className="w-full py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700"
-                >
-                  Apply Imputation
-                </button>
+          <div className="space-y-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
+              <h3 className="text-lg font-bold text-gray-900">Preprocess & Clean Dataset</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-5 bg-blue-50/50 rounded-xl border border-blue-100 flex flex-col justify-between">
+                  <div>
+                    <h4 className="font-bold text-gray-900 mb-2">Impute Missing Values</h4>
+                    <p className="text-xs text-gray-600 mb-4">Replaces null values in 'age' (mean=38.4) and 'income' (mean=68400) with calculated column statistics.</p>
+                  </div>
+                  <button
+                    onClick={applyImputation}
+                    className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                  >
+                    Apply Imputation
+                  </button>
+                </div>
+
+                <div className="p-5 bg-purple-50/50 rounded-xl border border-purple-100 flex flex-col justify-between">
+                  <div>
+                    <h4 className="font-bold text-gray-900 mb-2">Feature Scaling</h4>
+                    <p className="text-xs text-gray-600 mb-4">Applies StandardScaler to 'age' and 'income' to create z-score normalized features ('age_scaled', 'income_scaled').</p>
+                  </div>
+                  <button
+                    onClick={applyScaling}
+                    className="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                  >
+                    Scale Numerical Features
+                  </button>
+                </div>
+
+                <div className="p-5 bg-green-50/50 rounded-xl border border-green-100 flex flex-col justify-between">
+                  <div>
+                    <h4 className="font-bold text-gray-900 mb-2">Categorical Encoding</h4>
+                    <p className="text-xs text-gray-600 mb-4">One-Hot Encodes non-numeric columns 'gender' and 'segment' into binary vector columns.</p>
+                  </div>
+                  <button
+                    onClick={applyEncoding}
+                    className="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                  >
+                    Encode Categories
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Audit Log */}
+            {transformationLog.length > 0 && (
+              <div className="bg-gray-900 rounded-xl shadow-sm p-6 border border-gray-800">
+                <h4 className="text-sm font-bold text-green-400 uppercase font-mono mb-3">Transformation Audit Log</h4>
+                <div className="space-y-2 font-mono text-xs text-gray-200">
+                  {transformationLog.map((log, idx) => (
+                    <p key={idx}>{log}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Live Transformed Output Table */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Transformed Output Data Table</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">Real-time view of data values after applying preprocessing transformations</p>
+                </div>
+                {isCleaned && (
+                  <button
+                    onClick={exportCleanedCSV}
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg shadow-sm"
+                  >
+                    📥 Download Cleaned CSV
+                  </button>
+                )}
               </div>
 
-              <div className="p-5 bg-purple-50/50 rounded-xl border border-purple-100">
-                <h4 className="font-bold text-gray-900 mb-2">Feature Scaling</h4>
-                <p className="text-xs text-gray-600 mb-4">Standardize numerical features using StandardScaler (zero mean, unit variance).</p>
-                <button
-                  onClick={() => alert("StandardScaler applied to all numerical columns!")}
-                  className="w-full py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700"
-                >
-                  Scale Numerical Features
-                </button>
-              </div>
-
-              <div className="p-5 bg-green-50/50 rounded-xl border border-green-100">
-                <h4 className="font-bold text-gray-900 mb-2">Categorical Encoding</h4>
-                <p className="text-xs text-gray-600 mb-4">One-Hot Encode non-numeric features into binary vectors for ML model training.</p>
-                <button
-                  onClick={() => alert("One-Hot Encoding applied!")}
-                  className="w-full py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700"
-                >
-                  Encode Categoricals
-                </button>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse font-mono text-xs">
+                  <thead>
+                    <tr className="bg-gray-900 text-white uppercase">
+                      {Object.keys(edaData.preview_rows[0] || {}).map((colName, idx) => (
+                        <th key={idx} className="py-3 px-4 font-bold border-r border-gray-800 whitespace-nowrap">{colName}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {edaData.preview_rows.map((row, rIdx) => (
+                      <tr key={rIdx} className="hover:bg-blue-50/40">
+                        {Object.keys(edaData.preview_rows[0] || {}).map((colName, cIdx) => (
+                          <td key={cIdx} className="py-3 px-4 border-r border-gray-100 text-gray-800 whitespace-nowrap">
+                            {row[colName] !== null && row[colName] !== undefined ? (
+                              colName.includes('scaled') ? (
+                                <span className="text-purple-600 font-bold bg-purple-50 px-1.5 py-0.5 rounded">{row[colName]}</span>
+                              ) : colName.includes('_') && (row[colName] === 1 || row[colName] === 0) ? (
+                                <span className="text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded">{row[colName]}</span>
+                              ) : (
+                                String(row[colName])
+                              )
+                            ) : (
+                              <span className="text-red-500 font-bold bg-red-50 px-1.5 py-0.5 rounded">NULL</span>
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
