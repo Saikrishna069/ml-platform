@@ -182,7 +182,7 @@ export const ssoAPI = {
 };
 
 export const apiKeysAPI = {
-  create: (name: str, expiresInDays?: number) =>
+  create: (name: string, expiresInDays?: number) =>
     client.post('/api-keys/create', { name, expires_in_days: expiresInDays }),
   list: () => client.get('/api-keys/list'),
   revoke: (apiKeyId: number) => client.post(`/api-keys/revoke/${apiKeyId}`),
