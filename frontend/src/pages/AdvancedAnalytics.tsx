@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+// Pure JavaScript approximation for Error Function erf(x)
 function erf(x: number): number {
   const a1 = 0.254829592;
   const a2 = -0.284496736;
@@ -27,7 +28,10 @@ export default function AdvancedAnalytics() {
   const [power, setPower] = useState(0.80); // 80% statistical power
   const [dailyTraffic, setDailyTraffic] = useState(2500);
 
-  // 2. Sequential A/B Test State
+  // 2. Power Matrix Interactive Slider State
+  const [simulatedN, setSimulatedN] = useState(15000);
+
+  // 3. Sequential A/B Test State
   const [variantA_users, setVariantA_users] = useState(12400);
   const [variantA_conv, setVariantA_conv] = useState(620); // 5.0%
   const [variantB_users, setVariantB_users] = useState(12450);
@@ -50,7 +54,7 @@ export default function AdvancedAnalytics() {
     }
   };
 
-  // Calculations
+  // Calculations for Sizing
   const p1 = Math.max(0.001, Math.min(0.999, baselineConv / 100));
   const p2 = Math.max(0.001, Math.min(0.999, p1 * (1 + mdePct / 100)));
   const delta = Math.abs(p2 - p1);
@@ -64,6 +68,11 @@ export default function AdvancedAnalytics() {
   ) : 1000;
   const totalRequiredSamples = requiredSamplePerVariant * 2;
   const estimatedDays = Math.max(1, Math.ceil(totalRequiredSamples / (dailyTraffic || 1)));
+
+  // Calculations for Power Matrix
+  const achievedPowerPct = Math.min(99.9, Math.max(10.0, parseFloat((
+    (1 - (1 - (0.5 * (1 + erf((Math.sqrt(simulatedN / (requiredSamplePerVariant || 1)) * (zAlpha + zBeta) - zAlpha) / Math.sqrt(2)))))) * 100
+  ).toFixed(1))));
 
   // A/B Test Stats
   const rateA = variantA_users > 0 ? (variantA_conv / variantA_users) : 0;
@@ -80,6 +89,19 @@ export default function AdvancedAnalytics() {
   const pValue = parseFloat((2 * (1 - (0.5 * (1 + erf(Math.abs(zStat) / Math.sqrt(2)))))) .toFixed(4));
   const isStatSig = pValue < alpha;
 
+  // Simulate Batch Traffic Addition
+  const simulateBatchTraffic = () => {
+    const batchUsersA = 500;
+    const batchUsersB = 500;
+    const batchConvA = Math.round(batchUsersA * (p1 + (Math.random() * 0.01 - 0.005)));
+    const batchConvB = Math.round(batchUsersB * (p2 + (Math.random() * 0.01 - 0.005)));
+
+    setVariantA_users(prev => prev + batchUsersA);
+    setVariantA_conv(prev => prev + batchConvA);
+    setVariantB_users(prev => prev + batchUsersB);
+    setVariantB_conv(prev => prev + batchConvB);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 font-sans">
       <div className="max-w-7xl mx-auto">
@@ -88,7 +110,7 @@ export default function AdvancedAnalytics() {
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Advanced Analytics & Experimentation Studio</h1>
             <p className="text-sm text-gray-600">
-              Simple, user-friendly statistical sample size calculator, power risk matrix, and sequential A/B testing decision engine
+              100% interactive statistical sample size calculator, power risk matrix, and sequential A/B testing decision engine
             </p>
           </div>
 
@@ -254,6 +276,30 @@ export default function AdvancedAnalytics() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
             <h2 className="text-lg font-bold text-gray-900">Statistical Power & Risk Evaluation Matrix</h2>
 
+            {/* Interactive Sample Size vs Power Slider */}
+            <div className="p-6 bg-gray-50 border border-gray-200 rounded-2xl">
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-xs font-bold text-gray-700 uppercase">Simulate Sample Size per Variant (N)</label>
+                <span className="text-sm font-black text-indigo-600 font-mono">{simulatedN.toLocaleString()} Visitors</span>
+              </div>
+              <input
+                type="range"
+                min="1000"
+                max="50000"
+                step="1000"
+                value={simulatedN}
+                onChange={(e) => setSimulatedN(Number(e.target.value))}
+                className="w-full cursor-pointer accent-indigo-600 mb-4"
+              />
+
+              <div className="p-4 bg-white rounded-xl border border-gray-200 flex justify-between items-center">
+                <span className="text-xs font-bold text-gray-700">Achieved Statistical Power at N = {simulatedN.toLocaleString()}:</span>
+                <span className={`text-lg font-black ${achievedPowerPct >= 80 ? 'text-green-600' : 'text-amber-600'}`}>
+                  {achievedPowerPct}% Power
+                </span>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 bg-blue-50 border border-blue-200 rounded-2xl">
                 <span className="text-xs font-bold text-blue-800 uppercase">False Positive Risk (Type I Error α)</span>
@@ -280,13 +326,22 @@ export default function AdvancedAnalytics() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">Sequential A/B Test Live Decision Engine (SPRT)</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Input live results from Control (A) and Challenger (B) to evaluate statistical significance</p>
+                <p className="text-xs text-gray-500 mt-0.5">Input live results or click 'Simulate Batch Traffic' to run real-time hypothesis tests</p>
               </div>
-              <span className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider ${
-                isStatSig ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-yellow-100 text-yellow-800 border border-yellow-300'
-              }`}>
-                {isStatSig ? '🏆 WINNER DECIDED (STATISTICALLY SIGNIFICANT)' : '⏳ CONTINUE TESTING (INCONCLUSIVE)'}
-              </span>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={simulateBatchTraffic}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm"
+                >
+                  🚀 Simulate +1,000 Incoming Visitors
+                </button>
+                <span className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider ${
+                  isStatSig ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+                }`}>
+                  {isStatSig ? '🏆 WINNER DECIDED (STATISTICALLY SIGNIFICANT)' : '⏳ CONTINUE TESTING (INCONCLUSIVE)'}
+                </span>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
