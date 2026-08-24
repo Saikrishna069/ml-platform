@@ -5,9 +5,6 @@ __pycache__/
 *.so
 .Python
 env/
-venv/
-.venv/
-ENV/
 build/
 develop-eggs/
 dist/
@@ -23,25 +20,42 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.venv
+venv/
+ENV/
 
-# Node.js / React
-frontend/node_modules/
+# Node / React
 node_modules/
+frontend/node_modules/
 frontend/dist/
 frontend/build/
 .npm
-*.log
+.eslintcache
 
-# Databases & Local Artifacts
-*.db
-*.sqlite
-*.sqlite3
+# Environment & IDE
 .env
 .env.local
-.env.development
-
-# IDE & OS
+.env.production
 .vscode/
 .idea/
 .DS_Store
-Thumbs.db
+
+# Data / Uploads / Models
+*.csv
+*.parquet
+*.h5
+*.pkl
+*.onnx
+*.pt
+*.pth
+backend/app/uploads/*
+!backend/app/uploads/.gitkeep
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# System
+thumbs.db
+Desktop.ini
