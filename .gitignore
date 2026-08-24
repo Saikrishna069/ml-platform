@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Node / React
+node_modules/
+dist/
+build/
+.npm
+.eslintcache
+
+# Environment & Secrets
+.env
+.env.local
+.env.production
+*.pem
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Database & SQLite
+*.db
+*.sqlite3
+
+# Logs
+*.log
+logs/
+celerybeat-schedule
