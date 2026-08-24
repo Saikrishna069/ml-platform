@@ -30,10 +30,11 @@ interface GlobalPlatformState {
 const PlatformContext = createContext<GlobalPlatformState | undefined>(undefined);
 
 export const PlatformProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [fileName, setFileName] = useState('iris_dataset.csv');
-  const [uploadedRowCount, setUploadedRowCount] = useState(150);
-  const [availableColumns, setAvailableColumns] = useState(['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'species']);
-  const [targetColumn, setTargetColumnState] = useState('species');
+  // NO DEFAULT DATASET BY DEFAULT (EMPTY UNTIL USER UPLOADS)
+  const [fileName, setFileName] = useState('');
+  const [uploadedRowCount, setUploadedRowCount] = useState(0);
+  const [availableColumns, setAvailableColumns] = useState<string[]>([]);
+  const [targetColumn, setTargetColumnState] = useState('');
 
   const featureColumns = availableColumns.filter(c => c !== targetColumn);
 
@@ -46,25 +47,9 @@ export const PlatformProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }).sort((a, b) => b.importance - a.importance);
   };
 
-  const [featureImportances, setFeatureImportances] = useState(calculateImportances(featureColumns));
+  const [featureImportances, setFeatureImportances] = useState<{ name: string; importance: number }[]>([]);
 
-  const [activeDeployments, setActiveDeployments] = useState([
-    {
-      id: 1,
-      name: 'Soft Voting Ensemble (Iris Species)',
-      environment: 'production' as const,
-      version: 'v1.2.0-active',
-      status: 'deployed',
-      replicas: 4,
-      latency_ms: 14.2,
-      request_rate: 620,
-      error_rate: 0.01,
-      api_endpoint: '/api/inference/iris-species-ensemble',
-      framework: 'XGBoost + RF + CatBoost',
-      accuracy: 0.973,
-      sample_input: '{\n  "sepal_length": 5.1,\n  "sepal_width": 3.5,\n  "petal_length": 1.4,\n  "petal_width": 0.2\n}'
-    }
-  ]);
+  const [activeDeployments, setActiveDeployments] = useState<Array<any>>([]);
 
   const setUploadedDataset = (name: string, rows: number, cols: string[]) => {
     setFileName(name);
@@ -90,7 +75,7 @@ export const PlatformProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const newDep = {
       id: Date.now(),
-      name: `${modelName} (${fileName.split('.')[0]})`,
+      name: `${modelName} (${fileName ? fileName.split('.')[0] : 'custom'})`,
       environment: 'production' as const,
       version: 'v1.0.0-active',
       status: 'deployed',
