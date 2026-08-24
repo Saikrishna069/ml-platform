@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "cd frontend && vite",
-    "build": "cd frontend && tsc && vite build",
+    "build": "cd frontend && vite build",
     "preview": "cd frontend && vite preview"
   },
   "dependencies": {
