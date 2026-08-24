@@ -11,9 +11,11 @@ export default function ModelExplainability() {
   const [activeTab, setActiveTab] = useState<'global' | 'local' | 'boundary'>('global');
   const [selectedInstanceId, setSelectedInstanceId] = useState(1);
 
-  // 2D Decision Boundary Feature Selection
+  // 2D Decision Boundary State
   const [featureX, setFeatureX] = useState('petal_length');
   const [featureY, setFeatureY] = useState('petal_width');
+  const [meshResolution, setMeshResolution] = useState(20);
+  const [boundaryType, setBoundaryType] = useState<'rbf' | 'linear' | 'tree'>('rbf');
 
   // Sample Features List
   const availableFeatures = ['petal_length', 'petal_width', 'sepal_length', 'sepal_width'];
@@ -26,7 +28,7 @@ export default function ModelExplainability() {
     { name: 'sepal_width', mean_abs_shap: 0.073, color: 'from-cyan-500 to-blue-600' }
   ];
 
-  // Local Instance SHAP Values (Instance Row #1 vs #2 vs #3)
+  // Local Instance SHAP Values
   const sampleInstances: Record<number, { base_value: number; final_pred: number; features: SHAPFeature[] }> = {
     1: {
       base_value: 0.52,
@@ -62,6 +64,37 @@ export default function ModelExplainability() {
 
   const currentLocal = sampleInstances[selectedInstanceId] || sampleInstances[1];
 
+  // Generate 2D Grid Cells for Decision Boundary Contour Region
+  const gridCells = Array.from({ length: meshResolution }, (_, row) =>
+    Array.from({ length: meshResolution }, (_, col) => {
+      const normX = col / (meshResolution - 1);
+      const normY = (meshResolution - 1 - row) / (meshResolution - 1);
+      let predClass = 0;
+
+      if (boundaryType === 'rbf') {
+        const dist1 = Math.hypot(normX - 0.2, normY - 0.2);
+        const dist2 = Math.hypot(normX - 0.8, normY - 0.8);
+        predClass = dist1 < 0.4 ? 0 : (dist2 < 0.45 ? 2 : 1);
+      } else if (boundaryType === 'linear') {
+        predClass = (normX + normY) < 0.9 ? 0 : (normX + normY < 1.4 ? 1 : 2);
+      } else {
+        predClass = normX < 0.35 ? 0 : (normY < 0.6 ? 1 : 2);
+      }
+
+      return { row, col, predClass, normX, normY };
+    }).flat()
+  ).flat();
+
+  // Sample Data Points to scatter over the contour map
+  const samplePoints = [
+    { x: 0.15, y: 0.18, class: 0, label: 'Setosa Sample 1' },
+    { x: 0.25, y: 0.30, class: 0, label: 'Setosa Sample 2' },
+    { x: 0.50, y: 0.52, class: 1, label: 'Versicolor Sample 1' },
+    { x: 0.60, y: 0.48, class: 1, label: 'Versicolor Sample 2' },
+    { x: 0.82, y: 0.85, class: 2, label: 'Virginica Sample 1' },
+    { x: 0.88, y: 0.78, class: 2, label: 'Virginica Sample 2' }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 font-sans">
       <div className="max-w-7xl mx-auto">
@@ -69,7 +102,7 @@ export default function ModelExplainability() {
         <div className="mb-6">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Model Explainability & SHAP Visualizer</h1>
           <p className="text-sm text-gray-600">
-            Global SHAP feature attribution, local instance waterfall explanations, and 2D decision boundary maps
+            Global SHAP feature attribution, local instance waterfall explanations, and vibrant 2D decision boundary maps
           </p>
         </div>
 
@@ -97,7 +130,7 @@ export default function ModelExplainability() {
               activeTab === 'boundary' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            🗺️ 2D Decision Boundary Contour Maps
+            🗺️ Vibrant 2D Decision Boundary Contour Maps
           </button>
         </div>
 
@@ -155,7 +188,6 @@ export default function ModelExplainability() {
                 <p className="text-xs text-gray-500 mt-0.5">Decomposes single prediction $f(x)$ into baseline $E[f(x)]$ + individual feature SHAP contributions</p>
               </div>
 
-              {/* Instance Selector */}
               <div className="flex items-center gap-3">
                 <label className="text-xs font-bold text-gray-700 uppercase">Select Sample Instance:</label>
                 <select
@@ -170,7 +202,6 @@ export default function ModelExplainability() {
               </div>
             </div>
 
-            {/* Baseline vs Final Prediction Banner */}
             <div className="grid grid-cols-2 gap-4 p-4 bg-gray-900 rounded-xl text-white font-mono text-xs text-center">
               <div>
                 <span className="text-gray-400">Base Expected Value E[f(x)]:</span>
@@ -182,7 +213,6 @@ export default function ModelExplainability() {
               </div>
             </div>
 
-            {/* Waterfall Contribution Rows */}
             <div className="space-y-3 font-mono text-xs">
               {currentLocal.features.map((feat, idx) => (
                 <div key={idx} className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex justify-between items-center">
@@ -204,23 +234,25 @@ export default function ModelExplainability() {
           </div>
         )}
 
-        {/* TAB 3: 2D DECISION BOUNDARY CONTOUR MAPS */}
+        {/* TAB 3: VIBRANT 2D DECISION BOUNDARY CONTOUR REGION MAP */}
         {activeTab === 'boundary' && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">2D Decision Boundary Contour Region Map</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Visualizes decision boundaries and class separation regions between 2 selected features</p>
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <span>🗺️</span> Vibrant 2D Decision Boundary Contour Region Map
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">Visualizes decision regions and class separation boundaries between 2 selected features</p>
               </div>
 
-              {/* Feature Axis Selectors */}
-              <div className="flex items-center gap-3">
+              {/* Controls Header */}
+              <div className="flex flex-wrap items-center gap-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-700 uppercase mr-1">Axis X:</label>
+                  <label className="text-xs font-bold text-gray-700 uppercase mr-1">X-Axis:</label>
                   <select
                     value={featureX}
                     onChange={(e) => setFeatureX(e.target.value)}
-                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white font-mono"
+                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white font-mono font-bold"
                   >
                     {availableFeatures.map((f, idx) => (
                       <option key={idx} value={f}>{f}</option>
@@ -229,42 +261,93 @@ export default function ModelExplainability() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-gray-700 uppercase mr-1">Axis Y:</label>
+                  <label className="text-xs font-bold text-gray-700 uppercase mr-1">Y-Axis:</label>
                   <select
                     value={featureY}
                     onChange={(e) => setFeatureY(e.target.value)}
-                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white font-mono"
+                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white font-mono font-bold"
                   >
                     {availableFeatures.map((f, idx) => (
                       <option key={idx} value={f}>{f}</option>
                     ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-700 uppercase mr-1">Boundary Kernel:</label>
+                  <select
+                    value={boundaryType}
+                    onChange={(e) => setBoundaryType(e.target.value as any)}
+                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs bg-white font-mono font-bold"
+                  >
+                    <option value="rbf">RBF Non-Linear Kernel</option>
+                    <option value="linear">Linear Hyperplane</option>
+                    <option value="tree">Decision Tree Orthogonal</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* 2D Contour Region Simulation Box */}
-            <div className="p-8 bg-gray-900 rounded-2xl text-white font-mono relative overflow-hidden border border-gray-800">
-              <div className="flex justify-between text-xs text-gray-400 mb-2">
-                <span>Decision Region Map ({featureX} vs {featureY})</span>
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1"><span className="w-3 h-3 bg-indigo-500 rounded-full inline-block"></span> Class 0 (Setosa)</span>
-                  <span className="flex items-center gap-1"><span className="w-3 h-3 bg-emerald-400 rounded-full inline-block"></span> Class 1 (Versicolor)</span>
+            {/* VIBRANT CONTOUR CANVAS DISPLAY CONTAINER */}
+            <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
+              {/* Legend Bar */}
+              <div className="flex flex-wrap justify-between items-center mb-4 text-xs font-mono text-white pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3.5 h-3.5 rounded bg-blue-500 shadow-[0_0_8px_#3B82F6] inline-block"></span> Class 0 (Setosa Region)
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3.5 h-3.5 rounded bg-purple-500 shadow-[0_0_8px_#8B5CF6] inline-block"></span> Class 1 (Versicolor Region)
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3.5 h-3.5 rounded bg-emerald-400 shadow-[0_0_8px_#10B981] inline-block"></span> Class 2 (Virginica Region)
+                  </span>
                 </div>
+                <span className="text-slate-400">Resolution: {meshResolution}x{meshResolution} Mesh</span>
               </div>
 
-              {/* Grid Canvas Simulation */}
-              <div className="h-64 border-l-2 border-b-2 border-gray-700 relative flex items-center justify-center bg-gradient-to-tr from-indigo-900/60 via-purple-950/60 to-emerald-950/60 rounded">
-                <div className="absolute left-1/4 top-1/3 w-4 h-4 bg-indigo-400 rounded-full shadow-lg animate-pulse"></div>
-                <div className="absolute left-1/3 top-1/2 w-4 h-4 bg-indigo-500 rounded-full shadow-lg"></div>
-                <div className="absolute right-1/4 bottom-1/3 w-4 h-4 bg-emerald-400 rounded-full shadow-lg animate-pulse"></div>
-                <div className="absolute right-1/3 bottom-1/4 w-4 h-4 bg-emerald-500 rounded-full shadow-lg"></div>
-                <p className="text-xs text-gray-400 italic">2D Decision Contour Boundary Plane ({featureX} on X-axis, {featureY} on Y-axis)</p>
+              {/* 2D Mesh Contour Grid Visualizer */}
+              <div className="relative w-full h-[380px] bg-slate-900 rounded-xl overflow-hidden border border-slate-800 flex flex-col justify-between p-2">
+                <div
+                  className="w-full h-full grid gap-[1px] rounded"
+                  style={{
+                    gridTemplateColumns: `repeat(${meshResolution}, minmax(0, 1fr))`,
+                    gridTemplateRows: `repeat(${meshResolution}, minmax(0, 1fr))`
+                  }}
+                >
+                  {gridCells.map((cell, idx) => (
+                    <div
+                      key={idx}
+                      className={`transition-all duration-300 ${
+                        cell.predClass === 0 ? 'bg-blue-600/40 hover:bg-blue-500' :
+                        cell.predClass === 1 ? 'bg-purple-600/40 hover:bg-purple-500' : 'bg-emerald-500/40 hover:bg-emerald-400'
+                      }`}
+                      title={`Feature ${featureX}: ${(cell.normX * 5).toFixed(2)}, Feature ${featureY}: ${(cell.normY * 5).toFixed(2)} -> Predicted Class ${cell.predClass}`}
+                    ></div>
+                  ))}
+                </div>
+
+                {/* Overlaid Glowing Scatter Points */}
+                {samplePoints.map((pt, idx) => (
+                  <div
+                    key={idx}
+                    className={`absolute w-4 h-4 rounded-full border-2 border-white shadow-lg transition-transform hover:scale-150 cursor-pointer ${
+                      pt.class === 0 ? 'bg-blue-400 shadow-blue-500/50' :
+                      pt.class === 1 ? 'bg-purple-400 shadow-purple-500/50' : 'bg-emerald-300 shadow-emerald-500/50'
+                    }`}
+                    style={{
+                      left: `${pt.x * 90 + 5}%`,
+                      top: `${(1 - pt.y) * 85 + 5}%`
+                    }}
+                    title={`${pt.label} (${featureX}: ${(pt.x * 5).toFixed(1)}, ${featureY}: ${(pt.y * 5).toFixed(1)})`}
+                  ></div>
+                ))}
               </div>
 
-              <div className="flex justify-between text-[11px] text-gray-400 mt-2">
-                <span>0.0 ({featureX})</span>
-                <span>Max ({featureX})</span>
+              {/* Axes Labels */}
+              <div className="flex justify-between text-xs text-slate-400 font-mono mt-3">
+                <span>Y-Axis: {featureY} (Min: 0.0)</span>
+                <span>X-Axis: {featureX} (Max: 7.5)</span>
               </div>
             </div>
           </div>
