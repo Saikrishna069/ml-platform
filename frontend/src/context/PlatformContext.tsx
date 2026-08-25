@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 
 interface GlobalPlatformState {
+  hasUploadedFile: boolean;
   fileName: string;
   uploadedRowCount: number;
   availableColumns: string[];
@@ -30,15 +31,16 @@ interface GlobalPlatformState {
 const PlatformContext = createContext<GlobalPlatformState | undefined>(undefined);
 
 export const PlatformProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // NO DEFAULT DATASET BY DEFAULT (EMPTY UNTIL USER UPLOADS)
-  const [fileName, setFileName] = useState('');
-  const [uploadedRowCount, setUploadedRowCount] = useState(0);
+  const [hasUploadedFile, setHasUploadedFile] = useState<boolean>(false);
+  const [fileName, setFileName] = useState<string>('');
+  const [uploadedRowCount, setUploadedRowCount] = useState<number>(0);
   const [availableColumns, setAvailableColumns] = useState<string[]>([]);
-  const [targetColumn, setTargetColumnState] = useState('');
+  const [targetColumn, setTargetColumnState] = useState<string>('');
 
   const featureColumns = availableColumns.filter(c => c !== targetColumn);
 
   const calculateImportances = (feats: string[]) => {
+    if (feats.length === 0) return [];
     let remaining = 100;
     return feats.map((feat, idx) => {
       const imp = idx === feats.length - 1 ? Math.max(5, remaining) : parseFloat((Math.random() * (remaining / 1.8)).toFixed(1));
@@ -47,11 +49,12 @@ export const PlatformProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }).sort((a, b) => b.importance - a.importance);
   };
 
-  const [featureImportances, setFeatureImportances] = useState<{ name: string; importance: number }[]>([]);
+  const [featureImportances, setFeatureImportances] = useState(calculateImportances(featureColumns));
 
   const [activeDeployments, setActiveDeployments] = useState<Array<any>>([]);
 
   const setUploadedDataset = (name: string, rows: number, cols: string[]) => {
+    setHasUploadedFile(true);
     setFileName(name);
     setUploadedRowCount(rows);
     setAvailableColumns(cols);
@@ -75,7 +78,7 @@ export const PlatformProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const newDep = {
       id: Date.now(),
-      name: `${modelName} (${fileName ? fileName.split('.')[0] : 'custom'})`,
+      name: `${modelName} (${fileName ? fileName.split('.')[0] : 'custom-dataset'})`,
       environment: 'production' as const,
       version: 'v1.0.0-active',
       status: 'deployed',
@@ -94,6 +97,7 @@ export const PlatformProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   return (
     <PlatformContext.Provider value={{
+      hasUploadedFile,
       fileName,
       uploadedRowCount,
       availableColumns,
