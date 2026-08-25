@@ -56,7 +56,7 @@ export default function App() {
                   activeTab === 'marketplace' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                🏪 Marketplace
+                📦 Resources
               </button>
               <button
                 onClick={() => setActiveTab('analytics')}
