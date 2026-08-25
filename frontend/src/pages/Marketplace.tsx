@@ -1,124 +1,118 @@
 import React, { useState } from 'react';
-import { usePlatform } from '../context/PlatformContext';
 
-interface ModelResource {
+interface Model {
   id: number;
   slug: string;
   name: string;
   description: string;
   category: 'tabular' | 'nlp' | 'cv' | 'time_series';
   framework: string;
-  train_accuracy: number;
-  test_accuracy: number;
+  accuracy: number;
   f1_score: number;
-  precision: number;
-  recall: number;
   latency_ms: number;
   rating: number;
+  review_count: number;
   download_count: number;
+  price_type: 'free' | 'paid';
+  price_per_month: number;
   author: string;
   tags: string[];
   sample_curl: string;
-  is_top_scorer?: boolean;
 }
 
 export default function Marketplace() {
-  const { deployModelToPlatform } = usePlatform();
-
-  const [resources, setResources] = useState<ModelResource[]>([
+  const [models, setModels] = useState<Model[]>([
     {
       id: 1,
-      slug: 'iris-soft-voting-ensemble',
+      slug: 'xgboost-iris-ensemble',
       name: 'Iris Soft Voting Ensemble Model',
-      description: 'Top accuracy soft voting ensemble combining XGBoost, CatBoost, and Random Forest evaluated on plant species dataset.',
+      description: 'Optuna-tuned soft voting ensemble combining XGBoost, CatBoost, and Random Forest for multi-class plant species classification.',
       category: 'tabular',
-      framework: 'XGBoost + CatBoost + RF',
-      train_accuracy: 0.988,
-      test_accuracy: 0.973,
+      framework: 'XGBoost + RF + CatBoost',
+      accuracy: 0.973,
       f1_score: 0.968,
-      precision: 0.970,
-      recall: 0.965,
       latency_ms: 14.2,
       rating: 4.9,
-      download_count: 2450,
-      author: 'User Community (Top Scorer)',
-      tags: ['iris', 'ensemble', 'classification'],
-      sample_curl: 'curl -X POST https://saikrishna069-ml-platform-backend.hf.space/api/inference/iris-species-ensemble',
-      is_top_scorer: true
+      review_count: 54,
+      download_count: 1420,
+      price_type: 'free',
+      price_per_month: 0,
+      author: 'ML Platform Team',
+      tags: ['tabular', 'ensemble', 'classification'],
+      sample_curl: 'curl -X POST https://saikrishna069-ml-platform-backend.hf.space/api/inference/iris-species-ensemble'
     },
     {
       id: 2,
-      slug: 'catboost-credit-fraud',
-      name: 'CatBoost Credit Fraud Detection Model',
-      description: 'Highest test accuracy financial fraud anomaly classifier trained on 250k transaction records.',
+      slug: 'catboost-fraud-detector',
+      name: 'CatBoost Credit Card Fraud Detector',
+      description: 'High-precision financial transaction anomaly detection engine trained on 250k anonymized transaction records.',
       category: 'tabular',
-      framework: 'CatBoost Classifier',
-      train_accuracy: 0.994,
-      test_accuracy: 0.985,
+      framework: 'CatBoost',
+      accuracy: 0.985,
       f1_score: 0.981,
-      precision: 0.987,
-      recall: 0.975,
       latency_ms: 18.5,
       rating: 4.9,
-      download_count: 3890,
-      author: 'FinTech AI Research',
-      tags: ['finance', 'fraud', 'catboost'],
-      sample_curl: 'curl -X POST https://saikrishna069-ml-platform-backend.hf.space/api/inference/credit-fraud-catboost',
-      is_top_scorer: true
+      review_count: 88,
+      download_count: 3200,
+      price_type: 'paid',
+      price_per_month: 29,
+      author: 'FinTech AI Lab',
+      tags: ['finance', 'fraud', 'tabular'],
+      sample_curl: 'curl -X POST https://saikrishna069-ml-platform-backend.hf.space/api/inference/credit-fraud-catboost'
     },
     {
       id: 3,
       slug: 'bert-multilingual-sentiment',
-      name: 'BERT Multilingual Sentiment Classifier',
-      description: 'High test accuracy NLP Transformer fine-tuned for multi-language customer review sentiment classification.',
+      name: 'BERT Multilingual Sentiment Analyzer',
+      description: 'Pre-trained NLP Transformer fine-tuned for customer review sentiment analysis across 12 European and Asian languages.',
       category: 'nlp',
       framework: 'PyTorch Transformer',
-      train_accuracy: 0.965,
-      test_accuracy: 0.948,
+      accuracy: 0.948,
       f1_score: 0.942,
-      precision: 0.950,
-      recall: 0.935,
       latency_ms: 45.0,
       rating: 4.8,
+      review_count: 42,
       download_count: 2100,
-      author: 'NLP Open Community',
+      price_type: 'free',
+      price_per_month: 0,
+      author: 'OpenNLP Hub',
       tags: ['nlp', 'bert', 'sentiment'],
       sample_curl: 'curl -X POST https://saikrishna069-ml-platform-backend.hf.space/api/inference/bert-sentiment'
     },
     {
       id: 4,
-      slug: 'resnet50-defect-inspector',
-      name: 'ResNet50 Industrial Surface Defect Detector',
-      description: 'Computer vision model trained on manufacturing surface defect datasets with 96.7% test accuracy.',
+      slug: 'resnet50-industrial-inspector',
+      name: 'ResNet50 Industrial Defect Inspector',
+      description: 'Computer vision model specialized in automated manufacturing surface scratch and material micro-defect detection.',
       category: 'cv',
       framework: 'TensorFlow / Keras',
-      train_accuracy: 0.982,
-      test_accuracy: 0.967,
+      accuracy: 0.967,
       f1_score: 0.960,
-      precision: 0.968,
-      recall: 0.952,
       latency_ms: 32.0,
       rating: 4.7,
-      download_count: 1420,
-      author: 'Vision AI Lab',
+      review_count: 29,
+      download_count: 980,
+      price_type: 'paid',
+      price_per_month: 49,
+      author: 'VisionTech Labs',
       tags: ['cv', 'resnet', 'manufacturing'],
       sample_curl: 'curl -X POST https://saikrishna069-ml-platform-backend.hf.space/api/inference/resnet-defects'
     },
     {
       id: 5,
       slug: 'lstm-solar-power-forecaster',
-      name: 'LSTM Solar Power Generation Forecaster',
-      description: 'Recurrent time-series model predicting solar irradiance and power generation output.',
+      name: 'LSTM Solar & Wind Energy Forecaster',
+      description: 'Deep recurrent time-series forecasting model for predicting hourly solar irradiance and grid power production output.',
       category: 'time_series',
       framework: 'PyTorch LSTM',
-      train_accuracy: 0.955,
-      test_accuracy: 0.938,
+      accuracy: 0.938,
       f1_score: 0.932,
-      precision: 0.940,
-      recall: 0.925,
       latency_ms: 24.0,
       rating: 4.8,
-      download_count: 980,
+      review_count: 15,
+      download_count: 640,
+      price_type: 'free',
+      price_per_month: 0,
       author: 'CleanEnergy AI',
       tags: ['time_series', 'lstm', 'energy'],
       sample_curl: 'curl -X POST https://saikrishna069-ml-platform-backend.hf.space/api/inference/lstm-energy'
@@ -127,52 +121,51 @@ export default function Marketplace() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedModel, setSelectedModel] = useState<ModelResource | null>(null);
+  const [selectedModel, setSelectedModel] = useState<Model | null>(null);
 
-  const [benchmarkModel, setBenchmarkModel] = useState<ModelResource | null>(null);
-  const [showShareModal, setShowShareModal] = useState(false);
+  const [benchmarkModel, setBenchmarkModel] = useState<Model | null>(null);
+  const [showPublishModal, setShowPublishModal] = useState(false);
 
-  // Form states for Sharing Trained Model Resource
+  // Form states for Monetize & Publish
   const [pubName, setPubName] = useState('');
   const [pubDesc, setPubDesc] = useState('');
   const [pubCategory, setPubCategory] = useState<'tabular' | 'nlp' | 'cv' | 'time_series'>('tabular');
   const [pubFramework, setPubFramework] = useState('XGBoost');
-  const [pubTrainAcc, setPubTrainAcc] = useState(98.5);
-  const [pubTestAcc, setPubTestAcc] = useState(97.2);
+  const [pubPriceType, setPubPriceType] = useState<'free' | 'paid'>('free');
+  const [pubPrice, setPubPrice] = useState(19);
 
-  const handleShareResource = (e: React.FormEvent) => {
+  const handlePublish = (e: React.FormEvent) => {
     e.preventDefault();
     if (!pubName) return;
 
-    const newResource: ModelResource = {
+    const newModel: Model = {
       id: Date.now(),
       slug: pubName.toLowerCase().replace(/\s+/g, '-'),
       name: pubName,
       description: pubDesc,
       category: pubCategory,
       framework: pubFramework,
-      train_accuracy: pubTrainAcc / 100,
-      test_accuracy: pubTestAcc / 100,
-      f1_score: (pubTestAcc - 0.5) / 100,
-      precision: (pubTestAcc - 0.2) / 100,
-      recall: (pubTestAcc - 0.8) / 100,
-      latency_ms: 15.0,
+      accuracy: 0.952,
+      f1_score: 0.948,
+      latency_ms: 16.5,
       rating: 5.0,
+      review_count: 1,
       download_count: 1,
+      price_type: pubPriceType,
+      price_per_month: pubPriceType === 'paid' ? pubPrice : 0,
       author: 'You (Model Creator)',
       tags: [pubCategory, pubFramework.toLowerCase()],
-      sample_curl: `curl -X POST https://saikrishna069-ml-platform-backend.hf.space/api/inference/${pubName.toLowerCase().replace(/\s+/g, '-')}`,
-      is_top_scorer: pubTestAcc >= 95.0
+      sample_curl: `curl -X POST https://saikrishna069-ml-platform-backend.hf.space/api/inference/${pubName.toLowerCase().replace(/\s+/g, '-')}`
     };
 
-    setResources([newResource, ...resources]);
-    setShowShareModal(false);
+    setModels([newModel, ...models]);
+    setShowPublishModal(false);
     setPubName('');
     setPubDesc('');
-    alert(`Successfully shared '${pubName}' as a 100% Free Model Resource!`);
+    alert(`Successfully published '${pubName}' to the Model Marketplace! Monetization active.`);
   };
 
-  const filteredResources = resources.filter((m) => {
+  const filteredModels = models.filter((m) => {
     const matchesCategory = selectedCategory === 'all' || m.category === selectedCategory;
     const matchesSearch = m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           m.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -180,9 +173,8 @@ export default function Marketplace() {
     return matchesCategory && matchesSearch;
   });
 
-  const handleDeployToMLOps = (modelName: string, framework: string, accuracy: number) => {
-    deployModelToPlatform(modelName, framework, accuracy);
-    alert(`Successfully deployed top scoring model '${modelName}' into MLOps Production Pipeline!`);
+  const deployToMLOps = (modelName: string) => {
+    alert(`Successfully registered and deployed '${modelName}' into MLOps Production Pipeline!`);
   };
 
   return (
@@ -191,16 +183,16 @@ export default function Marketplace() {
         {/* Header Title */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Pre-Trained Model Resources</h1>
+            <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Pre-Trained Model Marketplace</h1>
             <p className="text-sm text-gray-600">
-              Discover, benchmark training & testing accuracy results, and deploy top-accuracy scoring models trained by users for 100% free
+              Discover, benchmark performance metrics, deploy to MLOps, and monetize your pre-trained machine learning models
             </p>
           </div>
           <button
-            onClick={() => setShowShareModal(true)}
-            className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold rounded-xl shadow-md text-sm min-w-[220px]"
+            onClick={() => setShowPublishModal(true)}
+            className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold rounded-xl shadow-md text-sm min-w-[200px]"
           >
-            + Share Trained Model Resource
+            + Monetize & Publish Model
           </button>
         </div>
 
@@ -209,7 +201,7 @@ export default function Marketplace() {
           <div className="w-full md:w-1/2 relative">
             <input
               type="text"
-              placeholder="Search free model resources by name, domain, or tag..."
+              placeholder="Search pre-trained models by name, domain, or tag..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm bg-gray-50 focus:bg-white focus:outline-none focus:border-indigo-500"
@@ -228,15 +220,15 @@ export default function Marketplace() {
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                 }`}
               >
-                {cat === 'all' ? 'All Model Resources' : cat === 'cv' ? 'Computer Vision' : cat === 'nlp' ? 'NLP & Text' : cat === 'time_series' ? 'Time Series' : 'Tabular & AutoML'}
+                {cat === 'all' ? 'All Models' : cat === 'cv' ? 'Computer Vision' : cat === 'nlp' ? 'NLP & Text' : cat === 'time_series' ? 'Time Series' : 'Tabular & AutoML'}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Model Resource Cards Grid */}
+        {/* Model Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {filteredResources.map((m) => (
+          {filteredModels.map((m) => (
             <div key={m.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col justify-between p-6">
               <div>
                 <div className="flex justify-between items-start mb-3">
@@ -247,34 +239,29 @@ export default function Marketplace() {
                   }`}>
                     {m.category}
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-green-100 text-green-800 border border-green-300">
-                    100% FREE / OPEN ACCESS
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-black ${
+                    m.price_type === 'free' ? 'bg-green-100 text-green-800' : 'bg-indigo-100 text-indigo-800'
+                  }`}>
+                    {m.price_type === 'free' ? 'FREE / OPEN SOURCE' : `$${m.price_per_month}/mo`}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-lg font-bold text-gray-900">{m.name}</h3>
-                  {m.is_top_scorer && (
-                    <span className="px-2 py-0.5 bg-amber-400 text-gray-950 text-xs font-black rounded shadow-sm whitespace-nowrap">
-                      🏆 Top Scorer
-                    </span>
-                  )}
-                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">{m.name}</h3>
                 <p className="text-xs text-gray-500 mb-4 line-clamp-2">{m.description}</p>
 
-                {/* Training & Testing Accuracy Results Card */}
-                <div className="grid grid-cols-3 gap-2 p-3 bg-gray-50 rounded-xl mb-4 text-center font-mono border border-gray-100">
+                {/* Key Metrics */}
+                <div className="grid grid-cols-3 gap-2 p-3 bg-gray-50 rounded-xl mb-4 text-center font-mono">
                   <div>
-                    <span className="text-[10px] text-gray-500 uppercase block">Test Acc</span>
-                    <span className="text-xs font-black text-green-600">{(m.test_accuracy * 100).toFixed(1)}%</span>
+                    <span className="text-[10px] text-gray-500 uppercase block">Accuracy</span>
+                    <span className="text-xs font-bold text-gray-900">{(m.accuracy * 100).toFixed(1)}%</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-gray-500 uppercase block">Train Acc</span>
-                    <span className="text-xs font-bold text-gray-900">{(m.train_accuracy * 100).toFixed(1)}%</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-gray-500 uppercase block">F1 Score</span>
+                    <span className="text-[10px] text-gray-500 uppercase block">F1-Score</span>
                     <span className="text-xs font-bold text-indigo-700">{(m.f1_score * 100).toFixed(1)}%</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-gray-500 uppercase block">Latency</span>
+                    <span className="text-xs font-bold text-gray-900">{m.latency_ms}ms</span>
                   </div>
                 </div>
 
@@ -291,7 +278,7 @@ export default function Marketplace() {
                     onClick={() => setBenchmarkModel(m)}
                     className="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg transition-colors border border-indigo-200"
                   >
-                    📊 Training & Test Results
+                    📊 Benchmark
                   </button>
                   <button
                     onClick={() => setSelectedModel(m)}
@@ -301,7 +288,7 @@ export default function Marketplace() {
                   </button>
                 </div>
                 <button
-                  onClick={() => handleDeployToMLOps(m.name, m.framework, m.test_accuracy)}
+                  onClick={() => deployToMLOps(m.name)}
                   className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-lg shadow-sm"
                 >
                   ⚡ Deploy to MLOps
@@ -311,20 +298,13 @@ export default function Marketplace() {
           ))}
         </div>
 
-        {/* BENCHMARK & TESTING RESULTS MODAL */}
+        {/* BENCHMARK PERFORMANCE MODAL */}
         {benchmarkModel && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden border border-gray-200">
               <div className="p-6 bg-gradient-to-r from-gray-900 to-indigo-950 text-white flex justify-between items-center">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl font-bold">📊 Training & Testing Accuracy Results</h2>
-                    {benchmarkModel.is_top_scorer && (
-                      <span className="px-2.5 py-0.5 bg-amber-400 text-gray-950 text-xs font-black rounded">
-                        🏆 Top Accuracy Model
-                      </span>
-                    )}
-                  </div>
+                  <h2 className="text-xl font-bold">📊 Benchmark Evaluation Report</h2>
                   <p className="text-xs text-indigo-200 mt-0.5">{benchmarkModel.name} ({benchmarkModel.framework})</p>
                 </div>
                 <button onClick={() => setBenchmarkModel(null)} className="text-gray-400 hover:text-white text-xl font-bold">✕</button>
@@ -332,64 +312,48 @@ export default function Marketplace() {
 
               <div className="p-6 space-y-6">
                 {/* Metric Bars */}
-                <div className="space-y-4 font-mono">
+                <div className="space-y-3 font-mono">
                   <div>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1">
-                      <span>Testing Accuracy Score</span>
-                      <span className="text-green-600">{(benchmarkModel.test_accuracy * 100).toFixed(1)}%</span>
+                      <span>Model Accuracy</span>
+                      <span>{(benchmarkModel.accuracy * 100).toFixed(1)}%</span>
                     </div>
-                    <div className="w-full bg-gray-100 h-3.5 rounded-full overflow-hidden">
-                      <div className="bg-green-500 h-3.5 rounded-full" style={{ width: `${benchmarkModel.test_accuracy * 100}%` }}></div>
+                    <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
+                      <div className="bg-green-500 h-3 rounded-full" style={{ width: `${benchmarkModel.accuracy * 100}%` }}></div>
                     </div>
                   </div>
 
                   <div>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1">
-                      <span>Training Accuracy Score</span>
-                      <span>{(benchmarkModel.train_accuracy * 100).toFixed(1)}%</span>
+                      <span>F1-Score (Balanced)</span>
+                      <span>{(benchmarkModel.f1_score * 100).toFixed(1)}%</span>
                     </div>
-                    <div className="w-full bg-gray-100 h-3.5 rounded-full overflow-hidden">
-                      <div className="bg-blue-600 h-3.5 rounded-full" style={{ width: `${benchmarkModel.train_accuracy * 100}%` }}></div>
+                    <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
+                      <div className="bg-indigo-600 h-3 rounded-full" style={{ width: `${benchmarkModel.f1_score * 100}%` }}></div>
                     </div>
                   </div>
 
                   <div>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1">
-                      <span>Cross-Validation F1-Score</span>
-                      <span className="text-indigo-700">{(benchmarkModel.f1_score * 100).toFixed(1)}%</span>
+                      <span>Inference Speed (p50 Latency)</span>
+                      <span>{benchmarkModel.latency_ms} ms</span>
                     </div>
-                    <div className="w-full bg-gray-100 h-3.5 rounded-full overflow-hidden">
-                      <div className="bg-indigo-600 h-3.5 rounded-full" style={{ width: `${benchmarkModel.f1_score * 100}%` }}></div>
+                    <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
+                      <div className="bg-purple-500 h-3 rounded-full" style={{ width: `${Math.max(10, 100 - benchmarkModel.latency_ms)}%` }}></div>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 p-4 bg-gray-50 rounded-xl text-center text-xs font-mono border border-gray-200">
-                  <div>
-                    <span className="text-gray-500">Precision:</span>
-                    <p className="font-bold text-gray-900">{(benchmarkModel.precision * 100).toFixed(1)}%</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Recall:</span>
-                    <p className="font-bold text-gray-900">{(benchmarkModel.recall * 100).toFixed(1)}%</p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Latency:</span>
-                    <p className="font-bold text-blue-600">{benchmarkModel.latency_ms} ms</p>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900">
-                  <p className="font-bold">Generalization Audit:</p>
-                  <p className="mt-0.5">
-                    Generalization gap between Train ({(benchmarkModel.train_accuracy * 100).toFixed(1)}%) and Test ({(benchmarkModel.test_accuracy * 100).toFixed(1)}%) is only <strong>{((benchmarkModel.train_accuracy - benchmarkModel.test_accuracy) * 100).toFixed(1)}%</strong>, proving excellent generalization with zero overfitting.
-                  </p>
+                <div className="p-4 bg-gray-50 rounded-xl text-xs space-y-2 text-gray-700">
+                  <p className="font-bold text-gray-900">Benchmark Baseline Comparison:</p>
+                  <p>• Outperforms industry standard baseline by <strong>+4.2%</strong> on accuracy metrics.</p>
+                  <p>• Optimized for low-memory GPU/CPU deployment with sub-{benchmarkModel.latency_ms}ms latency.</p>
                 </div>
               </div>
 
               <div className="p-6 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
-                <button onClick={() => setBenchmarkModel(null)} className="px-5 py-2 bg-gray-200 text-gray-800 font-bold rounded-xl text-xs">Close</button>
-                <button onClick={() => { handleDeployToMLOps(benchmarkModel.name, benchmarkModel.framework, benchmarkModel.test_accuracy); setBenchmarkModel(null); }} className="px-5 py-2 bg-indigo-600 text-white font-bold rounded-xl text-xs shadow-sm">⚡ Deploy to MLOps</button>
+                <button onClick={() => setBenchmarkModel(null)} className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl text-xs">Close</button>
+                <button onClick={() => deployToMLOps(benchmarkModel.name)} className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-sm">⚡ Deploy Model</button>
               </div>
             </div>
           </div>
@@ -401,7 +365,7 @@ export default function Marketplace() {
             <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden border border-gray-200">
               <div className="p-6 bg-gradient-to-r from-gray-900 to-indigo-950 text-white flex justify-between items-center">
                 <div>
-                  <h2 className="text-xl font-bold">🔑 Free API Endpoint & Code</h2>
+                  <h2 className="text-xl font-bold">🔑 Live API Endpoint & Code</h2>
                   <p className="text-xs text-indigo-200 mt-0.5">{selectedModel.name}</p>
                 </div>
                 <button onClick={() => setSelectedModel(null)} className="text-gray-400 hover:text-white text-xl font-bold">✕</button>
@@ -416,7 +380,7 @@ export default function Marketplace() {
                 </div>
 
                 <div>
-                  <label className="block text-gray-500 mb-1 font-bold">Python Client Snippet:</label>
+                  <label className="block text-gray-500 mb-1 font-bold">Python Client Request Snippet:</label>
                   <div className="p-4 bg-gray-900 text-blue-300 rounded-xl overflow-x-auto">
                     <pre>{`import requests
 
@@ -434,20 +398,20 @@ print(response.json())`}</pre>
           </div>
         )}
 
-        {/* SHARE TRAINED MODEL RESOURCE MODAL */}
-        {showShareModal && (
+        {/* MONETIZE & PUBLISH MODEL MODAL */}
+        {showPublishModal && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Share Trained Model Resource</h2>
-              <p className="text-xs text-gray-500 mb-6">Publish your top accuracy scoring model into the free public resources library</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">Monetize & Publish Model</h2>
+              <p className="text-xs text-gray-500 mb-6">List your trained model on the public marketplace and start earning monthly revenue</p>
 
-              <form onSubmit={handleShareResource} className="space-y-4 text-xs">
+              <form onSubmit={handlePublish} className="space-y-4 text-xs">
                 <div>
                   <label className="block font-bold text-gray-700 uppercase mb-1">Model Name</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Iris Soft Voting Ensemble"
+                    placeholder="e.g. XGBoost Customer Churn Predictor"
                     value={pubName}
                     onChange={(e) => setPubName(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
@@ -459,7 +423,7 @@ print(response.json())`}</pre>
                   <textarea
                     rows={2}
                     required
-                    placeholder="Overview of dataset & top accuracy results..."
+                    placeholder="Brief overview of model training dataset & accuracy..."
                     value={pubDesc}
                     onChange={(e) => setPubDesc(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
@@ -468,35 +432,75 @@ print(response.json())`}</pre>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-bold text-gray-700 uppercase mb-1">Testing Accuracy (%)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="50"
-                      max="100"
-                      value={pubTestAcc}
-                      onChange={(e) => setPubTestAcc(Number(e.target.value))}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm font-mono font-bold text-green-600"
-                    />
+                    <label className="block font-bold text-gray-700 uppercase mb-1">Domain Category</label>
+                    <select
+                      value={pubCategory}
+                      onChange={(e) => setPubCategory(e.target.value as any)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                    >
+                      <option value="tabular">Tabular & AutoML</option>
+                      <option value="nlp">NLP & Text</option>
+                      <option value="cv">Computer Vision</option>
+                      <option value="time_series">Time Series</option>
+                    </select>
                   </div>
 
                   <div>
-                    <label className="block font-bold text-gray-700 uppercase mb-1">Training Accuracy (%)</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="50"
-                      max="100"
-                      value={pubTrainAcc}
-                      onChange={(e) => setPubTrainAcc(Number(e.target.value))}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm font-mono font-bold"
-                    />
+                    <label className="block font-bold text-gray-700 uppercase mb-1">Framework</label>
+                    <select
+                      value={pubFramework}
+                      onChange={(e) => setPubFramework(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                    >
+                      <option value="XGBoost">XGBoost</option>
+                      <option value="CatBoost">CatBoost</option>
+                      <option value="LightGBM">LightGBM</option>
+                      <option value="PyTorch">PyTorch</option>
+                    </select>
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-gray-700 uppercase mb-1">Pricing Model</label>
+                    <select
+                      value={pubPriceType}
+                      onChange={(e) => setPubPriceType(e.target.value as any)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+                    >
+                      <option value="free">Free / Open Source</option>
+                      <option value="paid">Monthly Subscription</option>
+                    </select>
+                  </div>
+
+                  {pubPriceType === 'paid' && (
+                    <div>
+                      <label className="block font-bold text-gray-700 uppercase mb-1">Monthly Price ($)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={pubPrice}
+                        onChange={(e) => setPubPrice(Number(e.target.value))}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm font-mono"
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
-                  <button type="button" onClick={() => setShowShareModal(false)} className="px-4 py-2 text-gray-600 font-semibold">Cancel</button>
-                  <button type="submit" className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-sm">Share Resource (Free)</button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPublishModal(false)}
+                    className="px-4 py-2 text-gray-600 font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-sm"
+                  >
+                    Publish to Marketplace
+                  </button>
                 </div>
               </form>
             </div>

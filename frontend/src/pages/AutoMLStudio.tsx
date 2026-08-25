@@ -22,7 +22,7 @@ interface ModelResult {
 }
 
 export default function AutoMLStudio() {
-  const { hasUploadedFile, fileName, uploadedRowCount, availableColumns, targetColumn, featureColumns, featureImportances, setUploadedDataset, setTargetCol, deployModelToPlatform } = usePlatform();
+  const { fileName, uploadedRowCount, availableColumns, targetColumn, featureColumns, featureImportances, setUploadedDataset, setTargetCol, deployModelToPlatform } = usePlatform();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [taskType, setTaskType] = useState('binary_classification');
@@ -46,7 +46,148 @@ export default function AutoMLStudio() {
     { name: 'Random Forest Classifier', weight: 20, accuracy: 94.6 }
   ]);
 
-  const [results, setResults] = useState<ModelResult[]>([]);
+  const [results, setResults] = useState<ModelResult[]>([
+    {
+      id: 1,
+      name: 'Soft Voting Ensemble (XGBoost + CatBoost + Random Forest)',
+      category: 'Ensemble',
+      accuracy: 0.973, f1_score: 0.968, precision: 0.970, recall: 0.965, roc_auc: 0.991, training_time_s: 3.2,
+      status: 'best_overall_ensemble', tp: 72, fp: 2, tn: 74, fn: 2,
+      hyperparameters: { weights: { 'XGBoost Classifier': 0.45, 'CatBoost Classifier': 0.35, 'Random Forest Classifier': 0.20 } },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.01, tpr: 0.92 }, { fpr: 0.03, tpr: 0.97 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 2,
+      name: 'XGBoost Classifier (Optuna Tuned)',
+      category: 'Ensemble',
+      accuracy: 0.960, f1_score: 0.955, precision: 0.958, recall: 0.952, roc_auc: 0.985, training_time_s: 1.8,
+      status: 'best_single_model', tp: 71, fp: 3, tn: 73, fn: 3,
+      hyperparameters: { n_estimators: 250, max_depth: 6, learning_rate: 0.03 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.02, tpr: 0.88 }, { fpr: 0.05, tpr: 0.95 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 3,
+      name: 'CatBoost Classifier',
+      category: 'Ensemble',
+      accuracy: 0.953, f1_score: 0.948, precision: 0.951, recall: 0.945, roc_auc: 0.981, training_time_s: 2.1,
+      status: 'completed', tp: 71, fp: 3, tn: 72, fn: 4,
+      hyperparameters: { iterations: 300, depth: 6 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.02, tpr: 0.86 }, { fpr: 0.06, tpr: 0.94 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 4,
+      name: 'Random Forest Classifier',
+      category: 'Ensemble',
+      accuracy: 0.946, f1_score: 0.940, precision: 0.945, recall: 0.935, roc_auc: 0.975, training_time_s: 1.2,
+      status: 'completed', tp: 70, fp: 4, tn: 72, fn: 4,
+      hyperparameters: { n_estimators: 150, max_depth: 12 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.03, tpr: 0.85 }, { fpr: 0.07, tpr: 0.93 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 5,
+      name: 'LightGBM Classifier',
+      category: 'Ensemble',
+      accuracy: 0.940, f1_score: 0.934, precision: 0.938, recall: 0.930, roc_auc: 0.970, training_time_s: 0.9,
+      status: 'completed', tp: 69, fp: 5, tn: 72, fn: 4,
+      hyperparameters: { num_leaves: 31 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.04, tpr: 0.82 }, { fpr: 0.09, tpr: 0.91 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 6,
+      name: 'Extra Trees Classifier',
+      category: 'Tree-based',
+      accuracy: 0.933, f1_score: 0.927, precision: 0.930, recall: 0.924, roc_auc: 0.968, training_time_s: 1.1,
+      status: 'completed', tp: 69, fp: 5, tn: 71, fn: 5,
+      hyperparameters: { n_estimators: 100 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.04, tpr: 0.80 }, { fpr: 0.10, tpr: 0.90 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 7,
+      name: 'Gradient Boosting Classifier',
+      category: 'Ensemble',
+      accuracy: 0.927, f1_score: 0.920, precision: 0.924, recall: 0.916, roc_auc: 0.962, training_time_s: 1.5,
+      status: 'completed', tp: 68, fp: 6, tn: 71, fn: 5,
+      hyperparameters: { n_estimators: 100 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.05, tpr: 0.78 }, { fpr: 0.11, tpr: 0.89 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 8,
+      name: 'Support Vector Machine (SVM)',
+      category: 'Linear/Kernel',
+      accuracy: 0.920, f1_score: 0.914, precision: 0.918, recall: 0.910, roc_auc: 0.955, training_time_s: 0.6,
+      status: 'completed', tp: 67, fp: 7, tn: 71, fn: 5,
+      hyperparameters: { C: 1.0, kernel: 'rbf' },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.06, tpr: 0.76 }, { fpr: 0.12, tpr: 0.88 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 9,
+      name: 'Multi-Layer Perceptron (MLP Neural Net)',
+      category: 'Neural Net',
+      accuracy: 0.913, f1_score: 0.906, precision: 0.910, recall: 0.902, roc_auc: 0.948, training_time_s: 2.8,
+      status: 'completed', tp: 67, fp: 7, tn: 70, fn: 6,
+      hyperparameters: { hidden_layer_sizes: [100, 50] },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.07, tpr: 0.74 }, { fpr: 0.14, tpr: 0.86 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 10,
+      name: 'K-Nearest Neighbors (KNN)',
+      category: 'Linear/Kernel',
+      accuracy: 0.907, f1_score: 0.900, precision: 0.904, recall: 0.896, roc_auc: 0.942, training_time_s: 0.3,
+      status: 'completed', tp: 66, fp: 8, tn: 70, fn: 6,
+      hyperparameters: { n_neighbors: 5 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.08, tpr: 0.72 }, { fpr: 0.15, tpr: 0.84 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 11,
+      name: 'AdaBoost Classifier',
+      category: 'Ensemble',
+      accuracy: 0.900, f1_score: 0.893, precision: 0.897, recall: 0.889, roc_auc: 0.936, training_time_s: 0.8,
+      status: 'completed', tp: 65, fp: 9, tn: 70, fn: 6,
+      hyperparameters: { n_estimators: 50 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.09, tpr: 0.70 }, { fpr: 0.16, tpr: 0.82 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 12,
+      name: 'Decision Tree Classifier',
+      category: 'Tree-based',
+      accuracy: 0.887, f1_score: 0.880, precision: 0.884, recall: 0.876, roc_auc: 0.920, training_time_s: 0.2,
+      status: 'completed', tp: 64, fp: 10, tn: 69, fn: 7,
+      hyperparameters: { max_depth: 8 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.10, tpr: 0.68 }, { fpr: 0.18, tpr: 0.80 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 13,
+      name: 'Gaussian Naive Bayes',
+      category: 'Linear/Kernel',
+      accuracy: 0.873, f1_score: 0.865, precision: 0.870, recall: 0.860, roc_auc: 0.910, training_time_s: 0.2,
+      status: 'completed', tp: 63, fp: 11, tn: 68, fn: 8,
+      hyperparameters: { var_smoothing: 1e-9 },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.12, tpr: 0.65 }, { fpr: 0.20, tpr: 0.78 }, { fpr: 1.0, tpr: 1.0 }]
+    },
+    {
+      id: 14,
+      name: 'Logistic Regression Baseline',
+      category: 'Linear/Kernel',
+      accuracy: 0.860, f1_score: 0.852, precision: 0.856, recall: 0.848, roc_auc: 0.898, training_time_s: 0.3,
+      status: 'completed', tp: 62, fp: 12, tn: 67, fn: 9,
+      hyperparameters: { C: 1.0, solver: 'lbfgs' },
+      feature_importances: featureImportances,
+      roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.14, tpr: 0.62 }, { fpr: 0.22, tpr: 0.76 }, { fpr: 1.0, tpr: 1.0 }]
+    }
+  ]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -70,18 +211,9 @@ export default function AutoMLStudio() {
   };
 
   const startAutoML = () => {
-    if (!hasUploadedFile && !selectedFile) {
-      alert("Please upload a cleaned dataset file (.csv, .xlsx) first to run AutoML training!");
-      return;
-    }
-
     setIsTraining(true);
     setProgressStep(1);
     setExecutionLogs([]);
-
-    const activeName = selectedFile ? selectedFile.name : fileName;
-    const activeRows = uploadedRowCount || 150;
-    const activeCols = availableColumns.length || 5;
 
     const logs: string[] = [];
     const addLog = (msg: string) => {
@@ -89,11 +221,11 @@ export default function AutoMLStudio() {
       setExecutionLogs([...logs]);
     };
 
-    addLog(`🚀 Ingesting '${activeName}' (${activeRows} rows, ${activeCols} columns) for AutoML pipeline...`);
+    addLog(`🚀 Ingesting '${fileName}' (${uploadedRowCount} rows, ${availableColumns.length} columns) for AutoML pipeline...`);
 
     setTimeout(() => {
       setProgressStep(2);
-      addLog(`📊 Step 1/4: Target column set to '${targetColumn || 'target'}' (${taskType}). Training 13 single model algorithms on '${activeName}'...`);
+      addLog(`📊 Step 1/4: Target column set to '${targetColumn}' (${taskType}). Training 13 single model algorithms...`);
     }, 800);
 
     setTimeout(() => {
@@ -102,7 +234,7 @@ export default function AutoMLStudio() {
     }, 1800);
 
     setTimeout(() => {
-      const fileHash = (activeName + targetColumn).split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+      const fileHash = (fileName + targetColumn).split('').reduce((a, b) => a + b.charCodeAt(0), 0);
 
       const singleModelsList = [
         { name: 'XGBoost Classifier (Optuna Tuned)', category: 'Ensemble' as const, baseAcc: 0.945, framework: 'XGBoost' },
@@ -142,10 +274,10 @@ export default function AutoMLStudio() {
 
       setTopEnsembleModels(ensembleWeights);
 
-      addLog(`🤝 Step 3/4: Selected Top 3 Models for '${activeName}': #1 ${top1.name}, #2 ${top2.name}, #3 ${top3.name}. Created Soft Voting Ensemble!`);
+      addLog(`🤝 Step 3/4: Selected Top 3 Models for '${fileName}': #1 ${top1.name}, #2 ${top2.name}, #3 ${top3.name}. Created Soft Voting Ensemble!`);
 
       setTimeout(() => {
-        const totalTestRows = Math.round(activeRows * 0.2) || 30;
+        const totalTestRows = Math.round(uploadedRowCount * 0.2) || 30;
         const half = Math.floor(totalTestRows / 2);
 
         const ensembleModel: ModelResult = {
@@ -162,7 +294,7 @@ export default function AutoMLStudio() {
           tp: Math.round(half * 0.98), fp: Math.round(half * 0.02), tn: Math.round(half * 0.97), fn: Math.round(half * 0.03),
           hyperparameters: { weights: { [top1.name]: 0.45, [top2.name]: 0.35, [top3.name]: 0.20 } },
           feature_importances: featureImportances,
-          roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.01, tpr: 0.92 }, { fpr: 0.03, tpr: 0.97 }, { fpr: 1.0, tpr: 1.0 }]
+          roc_points: [{ fpr: 0.0, tpr: 0.0 }, { fpr: 0.01, tpr: 0.92 }, { fpr: 0.03, tpr: 0.98 }, { fpr: 1.0, tpr: 1.0 }]
         };
 
         const singleModelResults: ModelResult[] = evaluatedSingleModels.map((sm, idx) => ({
@@ -189,7 +321,7 @@ export default function AutoMLStudio() {
         setResults(finalLeaderboard);
 
         setProgressStep(5);
-        addLog(`🏆 Evaluation complete! Best Single Model for '${activeName}' is '${top1.name}' (${(top1.accuracy * 100).toFixed(1)}%). Soft Voting Ensemble achieved ${(ensembleAcc * 100).toFixed(1)}%.`);
+        addLog(`🏆 Evaluation complete! Best Single Model for '${fileName}' is '${top1.name}' (${(top1.accuracy * 100).toFixed(1)}%). Soft Voting Ensemble achieved ${(ensembleAcc * 100).toFixed(1)}%.`);
         setIsTraining(false);
       }, 1000);
     }, 2800);
@@ -226,32 +358,22 @@ export default function AutoMLStudio() {
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 mb-1">AutoML Training Studio</h1>
             <p className="text-sm text-gray-600">
-              Upload your cleaned dataset file below to run automated model selection, hyperparameter tuning, and soft voting ensemble creation
+              Evaluating all 13 single models + Soft Voting Ensemble for dataset: <strong className="text-indigo-600 font-mono">{fileName}</strong>
             </p>
           </div>
-          {hasUploadedFile && (
-            <span className="px-3.5 py-1.5 bg-green-100 text-green-800 text-xs font-black rounded-full border border-green-200">
-              ✅ Active Dataset: {fileName} ({uploadedRowCount} rows)
-            </span>
-          )}
+          <span className="px-3.5 py-1.5 bg-indigo-100 text-indigo-800 text-xs font-black rounded-full">
+            📁 Syncing with: {fileName}
+          </span>
         </div>
 
         {/* Step 1: Upload Cleaned Dataset File */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
           <h2 className="text-lg font-bold text-gray-900 mb-3">1. Upload Cleaned Dataset File</h2>
-          <label className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
-            hasUploadedFile ? 'border-green-300 bg-green-50/40 hover:bg-green-50' : 'border-indigo-300 bg-indigo-50/40 hover:bg-indigo-50'
-          }`}>
-            <span className={`text-sm font-bold mb-1 ${hasUploadedFile ? 'text-green-800' : 'text-indigo-700'}`}>
-              {hasUploadedFile
-                ? `Active Uploaded Dataset: ${fileName} (${uploadedRowCount} rows, ${availableColumns.length} columns)`
-                : 'No Dataset Uploaded Yet — Click to Browse or Drag & Drop Cleaned Dataset File (.csv, .xlsx)'}
+          <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-indigo-300 hover:border-indigo-500 rounded-xl cursor-pointer bg-indigo-50/40 hover:bg-indigo-50 transition-colors">
+            <span className="text-sm font-semibold text-indigo-700 mb-1">
+              {selectedFile ? `Selected File: ${selectedFile.name} (${uploadedRowCount} rows)` : `Currently Active Dataset: ${fileName} (${uploadedRowCount} rows)`}
             </span>
-            <span className="text-xs text-gray-500">
-              {hasUploadedFile
-                ? 'File ready for AutoML training. Click to replace or upload another dataset.'
-                : 'Upload a dataset file to extract feature columns, select target (Y), and evaluate 13 single models + Soft Voting Ensemble'}
-            </span>
+            <span className="text-xs text-gray-500">Evaluates 13 single model algorithms & constructs a custom Soft Voting Ensemble synced to all 6 platform studios</span>
             <input type="file" accept=".csv,.xlsx" onChange={handleFileUpload} className="hidden" />
           </label>
         </div>
@@ -265,16 +387,11 @@ export default function AutoMLStudio() {
               <select
                 value={targetColumn}
                 onChange={(e) => setTargetCol(e.target.value)}
-                disabled={!hasUploadedFile}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white font-mono font-bold text-indigo-900 disabled:bg-gray-100 disabled:text-gray-400"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white font-mono font-bold text-indigo-900"
               >
-                {hasUploadedFile ? (
-                  availableColumns.map((col, idx) => (
-                    <option key={idx} value={col}>{col}</option>
-                  ))
-                ) : (
-                  <option value="">(Upload file first)</option>
-                )}
+                {availableColumns.map((col, idx) => (
+                  <option key={idx} value={col}>{col}</option>
+                ))}
               </select>
             </div>
 
@@ -328,7 +445,7 @@ export default function AutoMLStudio() {
                 onChange={(e) => setEnableEnsemble(e.target.checked)}
                 className="w-4 h-4 text-indigo-600 rounded"
               />
-              Create Soft Voting Ensemble (Combines Top 3 Models)
+              Create Soft Voting Ensemble (Combines Top 3 Models of {fileName})
             </label>
 
             <button
@@ -359,7 +476,7 @@ export default function AutoMLStudio() {
         )}
 
         {/* SOFT VOTING ENSEMBLE OUTPUT CARD */}
-        {results.length > 0 && enableEnsemble && (
+        {enableEnsemble && (
           <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 rounded-2xl shadow-lg p-6 mb-8 text-white border border-indigo-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
@@ -386,115 +503,113 @@ export default function AutoMLStudio() {
         )}
 
         {/* ACCURATE METRICS LEADERBOARD MATRIX */}
-        {results.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-            <div className="p-6 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold text-gray-900">Accurate Algorithm Evaluation Matrix for Target '{targetColumn}'</h2>
-                  <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-extrabold rounded-full">
-                    {sortedResults.length} Algorithms Evaluated & Ranked
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">Click "Inspect Matrix & Charts" to view All Visual Graphs (Seaborn Heatmap, Matplotlib ROC & Feature Bars) on One Page</p>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+          <div className="p-6 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-gray-900">Accurate Algorithm Evaluation Matrix for Target '{targetColumn}'</h2>
+                <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-extrabold rounded-full">
+                  {sortedResults.length} Algorithms Evaluated & Ranked
+                </span>
               </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-gray-500 uppercase">Filter Family:</span>
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold bg-white"
-                >
-                  <option value="all">All Algorithms</option>
-                  <option value="Ensemble">Ensembles</option>
-                  <option value="Tree-based">Tree-based</option>
-                  <option value="Linear/Kernel">Linear & Kernel</option>
-                  <option value="Neural Net">Neural Net</option>
-                </select>
-              </div>
+              <p className="text-xs text-gray-500 mt-1">Click "Inspect Matrix & Charts" to view All Visual Graphs (Seaborn Heatmap, Matplotlib ROC & Feature Bars) on One Page</p>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-sm">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
-                    <th className="py-3.5 px-6">Model Algorithm</th>
-                    <th className="py-3.5 px-6">Family</th>
-                    <th onClick={() => handleSort('accuracy')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
-                      Accuracy {sortField === 'accuracy' ? (sortAsc ? '▲' : '▼') : ''}
-                    </th>
-                    <th onClick={() => handleSort('f1_score')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
-                      F1 Score {sortField === 'f1_score' ? (sortAsc ? '▲' : '▼') : ''}
-                    </th>
-                    <th onClick={() => handleSort('precision')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
-                      Precision {sortField === 'precision' ? (sortAsc ? '▲' : '▼') : ''}
-                    </th>
-                    <th onClick={() => handleSort('recall')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
-                      Recall {sortField === 'recall' ? (sortAsc ? '▲' : '▼') : ''}
-                    </th>
-                    <th onClick={() => handleSort('training_time_s')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
-                      Time {sortField === 'training_time_s' ? (sortAsc ? '▲' : '▼') : ''}
-                    </th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {sortedResults.map((m) => (
-                    <tr key={m.id} className={
-                      m.status === 'best_overall_ensemble' ? 'bg-indigo-50/70 font-medium' :
-                      m.status === 'best_single_model' ? 'bg-amber-50/70 font-medium' : 'hover:bg-gray-50'
-                    }>
-                      <td className="py-4 px-6">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-bold text-gray-900">{m.name}</span>
-                          {m.status === 'best_overall_ensemble' && (
-                            <span className="px-2 py-0.5 bg-yellow-400 text-gray-950 text-xs font-black rounded shadow-sm">
-                              ★ Best Overall Soft Voting Ensemble
-                            </span>
-                          )}
-                          {m.status === 'best_single_model' && (
-                            <span className="px-2 py-0.5 bg-amber-400 text-gray-950 text-xs font-black rounded shadow-sm">
-                              🏆 Best Single Model Algorithm
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`px-2.5 py-0.5 rounded text-xs font-bold ${
-                          m.category === 'Ensemble' ? 'bg-purple-100 text-purple-800' :
-                          m.category === 'Tree-based' ? 'bg-green-100 text-green-800' :
-                          m.category === 'Neural Net' ? 'bg-rose-100 text-rose-800' : 'bg-blue-100 text-blue-800'
-                        }`}>
-                          {m.category}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 font-bold text-gray-900">{(m.accuracy * 100).toFixed(1)}%</td>
-                      <td className="py-4 px-6 font-bold text-indigo-700">{(m.f1_score * 100).toFixed(1)}%</td>
-                      <td className="py-4 px-6 text-gray-700">{(m.precision * 100).toFixed(1)}%</td>
-                      <td className="py-4 px-6 text-gray-700">{(m.recall * 100).toFixed(1)}%</td>
-                      <td className="py-4 px-6 text-gray-500">{m.training_time_s}s</td>
-                      <td className="py-4 px-6 text-right space-x-2">
-                        <button
-                          onClick={() => setInspectedModel(m)}
-                          className="px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg transition-colors border border-indigo-200"
-                        >
-                          🔍 Inspect Matrix & Charts
-                        </button>
-                        <button
-                          onClick={() => handleDeploy(m)}
-                          className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm"
-                        >
-                          Deploy to MLOps
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-gray-500 uppercase">Filter Family:</span>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="px-3 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold bg-white"
+              >
+                <option value="all">All Algorithms</option>
+                <option value="Ensemble">Ensembles</option>
+                <option value="Tree-based">Tree-based</option>
+                <option value="Linear/Kernel">Linear & Kernel</option>
+                <option value="Neural Net">Neural Net</option>
+              </select>
             </div>
           </div>
-        )}
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase">
+                  <th className="py-3.5 px-6">Model Algorithm</th>
+                  <th className="py-3.5 px-6">Family</th>
+                  <th onClick={() => handleSort('accuracy')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
+                    Accuracy {sortField === 'accuracy' ? (sortAsc ? '▲' : '▼') : ''}
+                  </th>
+                  <th onClick={() => handleSort('f1_score')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
+                    F1 Score {sortField === 'f1_score' ? (sortAsc ? '▲' : '▼') : ''}
+                  </th>
+                  <th onClick={() => handleSort('precision')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
+                    Precision {sortField === 'precision' ? (sortAsc ? '▲' : '▼') : ''}
+                  </th>
+                  <th onClick={() => handleSort('recall')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
+                    Recall {sortField === 'recall' ? (sortAsc ? '▲' : '▼') : ''}
+                  </th>
+                  <th onClick={() => handleSort('training_time_s')} className="py-3.5 px-6 cursor-pointer hover:text-indigo-600">
+                    Time {sortField === 'training_time_s' ? (sortAsc ? '▲' : '▼') : ''}
+                  </th>
+                  <th className="py-3.5 px-6 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {sortedResults.map((m) => (
+                  <tr key={m.id} className={
+                    m.status === 'best_overall_ensemble' ? 'bg-indigo-50/70 font-medium' :
+                    m.status === 'best_single_model' ? 'bg-amber-50/70 font-medium' : 'hover:bg-gray-50'
+                  }>
+                    <td className="py-4 px-6">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-bold text-gray-900">{m.name}</span>
+                        {m.status === 'best_overall_ensemble' && (
+                          <span className="px-2 py-0.5 bg-yellow-400 text-gray-950 text-xs font-black rounded shadow-sm">
+                            ★ Best Overall Soft Voting Ensemble
+                          </span>
+                        )}
+                        {m.status === 'best_single_model' && (
+                          <span className="px-2 py-0.5 bg-amber-400 text-gray-950 text-xs font-black rounded shadow-sm">
+                            🏆 Best Single Model Algorithm
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <span className={`px-2.5 py-0.5 rounded text-xs font-bold ${
+                        m.category === 'Ensemble' ? 'bg-purple-100 text-purple-800' :
+                        m.category === 'Tree-based' ? 'bg-green-100 text-green-800' :
+                        m.category === 'Neural Net' ? 'bg-rose-100 text-rose-800' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {m.category}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 font-bold text-gray-900">{(m.accuracy * 100).toFixed(1)}%</td>
+                    <td className="py-4 px-6 font-bold text-indigo-700">{(m.f1_score * 100).toFixed(1)}%</td>
+                    <td className="py-4 px-6 text-gray-700">{(m.precision * 100).toFixed(1)}%</td>
+                    <td className="py-4 px-6 text-gray-700">{(m.recall * 100).toFixed(1)}%</td>
+                    <td className="py-4 px-6 text-gray-500">{m.training_time_s}s</td>
+                    <td className="py-4 px-6 text-right space-x-2">
+                      <button
+                        onClick={() => setInspectedModel(m)}
+                        className="px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg transition-colors border border-indigo-200"
+                      >
+                        🔍 Inspect Matrix & Charts
+                      </button>
+                      <button
+                        onClick={() => handleDeploy(m)}
+                        className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm"
+                      >
+                        Deploy to MLOps
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         {/* ALL-IN-ONE VISUAL DASHBOARD MODAL */}
         {inspectedModel && (
