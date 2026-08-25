@@ -204,9 +204,8 @@ export default function Marketplace() {
               placeholder="Search pre-trained models by name, domain, or tag..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm bg-gray-50 focus:bg-white focus:outline-none focus:border-indigo-500"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm bg-gray-50 focus:bg-white focus:outline-none focus:border-indigo-500"
             />
-            <span className="absolute left-3.5 top-3 text-gray-400 text-sm">🔍</span>
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
@@ -267,7 +266,7 @@ export default function Marketplace() {
 
                 <div className="flex justify-between items-center text-xs text-gray-500 mb-4 font-mono">
                   <span>Author: {m.author}</span>
-                  <span>★ {m.rating} ({m.download_count} dl)</span>
+                  <span>Rating: {m.rating}/5.0 ({m.download_count} dl)</span>
                 </div>
               </div>
 
@@ -278,20 +277,20 @@ export default function Marketplace() {
                     onClick={() => setBenchmarkModel(m)}
                     className="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg transition-colors border border-indigo-200"
                   >
-                    📊 Benchmark
+                    Benchmark
                   </button>
                   <button
                     onClick={() => setSelectedModel(m)}
                     className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-lg transition-colors"
                   >
-                    🔑 API & Code
+                    API & Code
                   </button>
                 </div>
                 <button
                   onClick={() => deployToMLOps(m.name)}
                   className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold rounded-lg shadow-sm"
                 >
-                  ⚡ Deploy to MLOps
+                  Deploy to MLOps
                 </button>
               </div>
             </div>

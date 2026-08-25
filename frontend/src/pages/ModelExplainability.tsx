@@ -124,7 +124,7 @@ export default function ModelExplainability() {
     reportLines.push(`**Generated Date**: ${new Date().toLocaleString()}`);
     reportLines.push(`\n---\n`);
 
-    reportLines.push(`## 1. 📊 Global Feature Attribution (TreeSHAP Ranking)`);
+    reportLines.push(`## 1. Global Feature Attribution (TreeSHAP Ranking)`);
     reportLines.push(`| Rank | Feature Name | Importance (%) |`);
     reportLines.push(`|:-----|:-------------|---------------:|`);
     featureImportances.forEach((f, idx) => {
@@ -132,7 +132,7 @@ export default function ModelExplainability() {
     });
     reportLines.push(`\n---\n`);
 
-    reportLines.push(`## 2. 🔍 Local Instance Prediction Waterfall Explanation (File Row #${selectedInstanceId})`);
+    reportLines.push(`## 2. Local Instance Prediction Waterfall Explanation (File Row #${selectedInstanceId})`);
     reportLines.push(`- **Base Expected Value E[f(x)]**: ${currentLocal.base_value}`);
     reportLines.push(`- **Final Model Prediction f(x)**: ${currentLocal.final_pred}`);
     reportLines.push(`\n| Feature Name | Value | SHAP Contribution | Direction |`);
@@ -142,7 +142,7 @@ export default function ModelExplainability() {
     });
     reportLines.push(`\n---\n`);
 
-    reportLines.push(`## 3. 🗺️ 2D Decision Boundary Contour Region Map`);
+    reportLines.push(`## 3. 2D Decision Boundary Contour Region Map`);
     reportLines.push(`- **X-Axis Feature**: \`${featureX}\` (Min: ${minX}, Max: ${maxX})`);
     reportLines.push(`- **Y-Axis Feature**: \`${featureY}\` (Min: ${minY}, Max: ${maxY})`);
     reportLines.push(`- **Boundary Kernel**: \`${boundaryKernel.toUpperCase()}\``);
@@ -166,15 +166,15 @@ export default function ModelExplainability() {
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Model Explainability & SHAP Visualizer</h1>
             <p className="text-sm text-gray-600">
-              Accurate SHAP Attributions, Waterfall Plots, and 2D Decision Boundary Contour Maps for uploaded file: <strong className="text-indigo-600 font-mono">{fileName}</strong> (Target: <strong className="text-purple-600 font-mono">{targetColumn}</strong>)
+              Accurate SHAP Attributions, Waterfall Plots, and 2D Decision Boundary Contour Maps for uploaded file: <strong className="text-indigo-600 font-mono">{fileName}</strong> (Target: <strong className="text-indigo-900 font-mono">{targetColumn}</strong>)
             </p>
           </div>
 
           <button
             onClick={downloadReport}
-            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold rounded-xl shadow-md text-sm min-w-[240px] flex items-center justify-center gap-2 transition-all"
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm text-sm min-w-[240px] flex items-center justify-center gap-2 transition-all"
           >
-            <span>📥</span> Download Explainability Report (.md)
+            Download Explainability Report (.md)
           </button>
         </div>
 
@@ -185,12 +185,12 @@ export default function ModelExplainability() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <span>📊</span> 1. Global Feature Attribution (SHAP Summary) for '{fileName}'
+                <h2 className="text-xl font-bold text-gray-900">
+                  1. Global Feature Attribution (SHAP Summary) for '{fileName}'
                 </h2>
                 <p className="text-xs text-gray-500 mt-0.5">Ranks your exact dataset columns by overall impact on target '{targetColumn}'</p>
               </div>
-              <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-black rounded-full">
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 text-xs font-bold rounded-full border border-gray-200">
                 TreeSHAP Explainer Engine
               </span>
             </div>
@@ -205,7 +205,7 @@ export default function ModelExplainability() {
                   </div>
                   <div className="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 h-4 rounded-full transition-all"
+                      className="bg-indigo-600 h-4 rounded-full transition-all"
                       style={{ width: `${f.importance}%` }}
                     ></div>
                   </div>
@@ -214,7 +214,6 @@ export default function ModelExplainability() {
             </div>
 
             <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900 flex items-start gap-3">
-              <span className="text-lg">💡</span>
               <div>
                 <p className="font-bold">Global Feature Insights for '{fileName}':</p>
                 <p className="mt-0.5">
@@ -228,8 +227,8 @@ export default function ModelExplainability() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <span>🔍</span> 2. Local Instance Prediction Waterfall Explanation for '{fileName}'
+                <h2 className="text-xl font-bold text-gray-900">
+                  2. Local Instance Prediction Waterfall Explanation for '{fileName}'
                 </h2>
                 <p className="text-xs text-gray-500 mt-0.5">Decomposes single prediction $f(x)$ for target '{targetColumn}' into baseline $E[f(x)]$ + feature SHAP contributions</p>
               </div>
@@ -283,8 +282,8 @@ export default function ModelExplainability() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <span>🗺️</span> 3. Accurate 2D Decision Boundary Contour Map for '{fileName}'
+                <h2 className="text-xl font-bold text-gray-900">
+                  3. Accurate 2D Decision Boundary Contour Map for '{fileName}'
                 </h2>
                 <p className="text-xs text-gray-500 mt-0.5">Calculates mathematical decision regions between '{featureX}' and '{featureY}' for target '{targetColumn}'</p>
               </div>
@@ -332,18 +331,18 @@ export default function ModelExplainability() {
               </div>
             </div>
 
-            {/* VIBRANT CONTOUR CANVAS DISPLAY CONTAINER */}
+            {/* CONTOUR CANVAS DISPLAY CONTAINER */}
             <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden">
               <div className="flex flex-wrap justify-between items-center mb-4 text-xs font-mono text-white pb-3 border-b border-slate-800">
                 <div className="flex items-center gap-4">
                   <span className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3.5 rounded bg-blue-500 shadow-[0_0_8px_#3B82F6] inline-block"></span> Class 0 Region ({targetColumn}=0)
+                    <span className="w-3.5 h-3.5 rounded bg-blue-500 inline-block"></span> Class 0 Region ({targetColumn}=0)
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3.5 rounded bg-purple-500 shadow-[0_0_8px_#8B5CF6] inline-block"></span> Class 1 Region ({targetColumn}=1)
+                    <span className="w-3.5 h-3.5 rounded bg-purple-500 inline-block"></span> Class 1 Region ({targetColumn}=1)
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3.5 rounded bg-emerald-400 shadow-[0_0_8px_#10B981] inline-block"></span> Class 2 Region ({targetColumn}=2)
+                    <span className="w-3.5 h-3.5 rounded bg-emerald-400 inline-block"></span> Class 2 Region ({targetColumn}=2)
                   </span>
                 </div>
                 <span className="text-slate-400">Mesh Resolution: {meshResolution}x{meshResolution}</span>
@@ -375,8 +374,8 @@ export default function ModelExplainability() {
                   <div
                     key={idx}
                     className={`absolute w-4 h-4 rounded-full border-2 border-white shadow-lg transition-transform hover:scale-150 cursor-pointer ${
-                      pt.class === 0 ? 'bg-blue-400 shadow-blue-500/50' :
-                      pt.class === 1 ? 'bg-purple-400 shadow-purple-500/50' : 'bg-emerald-300 shadow-emerald-500/50'
+                      pt.class === 0 ? 'bg-blue-400' :
+                      pt.class === 1 ? 'bg-purple-400' : 'bg-emerald-300'
                     }`}
                     style={{
                       left: `${((pt.x - minX) / (maxX - minX)) * 88 + 6}%`,

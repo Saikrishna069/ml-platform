@@ -289,7 +289,7 @@ export default function DatasetStudio() {
               onClick={exportCleanedCSV}
               className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-sm text-sm flex items-center gap-2 transition-all"
             >
-              📥 Download Cleaned Dataset (.csv)
+              Download Cleaned Dataset (.csv)
             </button>
           )}
         </div>
@@ -307,7 +307,7 @@ export default function DatasetStudio() {
             </label>
             {isProcessing && (
               <div className="flex items-center gap-2 text-blue-600 font-bold text-sm">
-                <span className="animate-spin text-xl">🌀</span> Parsing & Analyzing File...
+                Parsing & Analyzing File...
               </div>
             )}
           </div>
@@ -351,7 +351,7 @@ export default function DatasetStudio() {
               activeSubTab === 'overview' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            📋 Column Profiling
+            Column Profiling
           </button>
           <button
             onClick={() => setActiveSubTab('preview')}
@@ -359,7 +359,7 @@ export default function DatasetStudio() {
               activeSubTab === 'preview' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            🔍 Data Preview Table
+            Data Preview Table
           </button>
           <button
             onClick={() => setActiveSubTab('statistics')}
@@ -367,7 +367,7 @@ export default function DatasetStudio() {
               activeSubTab === 'statistics' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            📊 Summary Statistics
+            Summary Statistics
           </button>
           <button
             onClick={() => setActiveSubTab('correlations')}
@@ -375,7 +375,7 @@ export default function DatasetStudio() {
               activeSubTab === 'correlations' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            🔥 Feature Correlations
+            Feature Correlations
           </button>
           <button
             onClick={() => setActiveSubTab('cleaning')}
@@ -383,7 +383,7 @@ export default function DatasetStudio() {
               activeSubTab === 'cleaning' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            ⚡ Data Preprocessing
+            Data Preprocessing
           </button>
         </div>
 

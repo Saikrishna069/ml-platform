@@ -221,16 +221,16 @@ export default function AutoMLStudio() {
       setExecutionLogs([...logs]);
     };
 
-    addLog(`🚀 Ingesting '${fileName}' (${uploadedRowCount} rows, ${availableColumns.length} columns) for AutoML pipeline...`);
+    addLog(`Ingesting '${fileName}' (${uploadedRowCount} rows, ${availableColumns.length} columns) for AutoML pipeline...`);
 
     setTimeout(() => {
       setProgressStep(2);
-      addLog(`📊 Step 1/4: Target column set to '${targetColumn}' (${taskType}). Training 13 single model algorithms...`);
+      addLog(`Step 1/4: Target column set to '${targetColumn}' (${taskType}). Training 13 single model algorithms...`);
     }, 800);
 
     setTimeout(() => {
       setProgressStep(3);
-      addLog(`⚙️ Step 2/4: Optuna optimization executing ${tuningTrials} hyperparameter trials across all models...`);
+      addLog(`Step 2/4: Optuna optimization executing ${tuningTrials} hyperparameter trials across all models...`);
     }, 1800);
 
     setTimeout(() => {
@@ -274,7 +274,7 @@ export default function AutoMLStudio() {
 
       setTopEnsembleModels(ensembleWeights);
 
-      addLog(`🤝 Step 3/4: Selected Top 3 Models for '${fileName}': #1 ${top1.name}, #2 ${top2.name}, #3 ${top3.name}. Created Soft Voting Ensemble!`);
+      addLog(`Step 3/4: Selected Top 3 Models for '${fileName}': #1 ${top1.name}, #2 ${top2.name}, #3 ${top3.name}. Created Soft Voting Ensemble!`);
 
       setTimeout(() => {
         const totalTestRows = Math.round(uploadedRowCount * 0.2) || 30;
@@ -321,7 +321,7 @@ export default function AutoMLStudio() {
         setResults(finalLeaderboard);
 
         setProgressStep(5);
-        addLog(`🏆 Evaluation complete! Best Single Model for '${fileName}' is '${top1.name}' (${(top1.accuracy * 100).toFixed(1)}%). Soft Voting Ensemble achieved ${(ensembleAcc * 100).toFixed(1)}%.`);
+        addLog(`Evaluation complete! Best Single Model for '${fileName}' is '${top1.name}' (${(top1.accuracy * 100).toFixed(1)}%). Soft Voting Ensemble achieved ${(ensembleAcc * 100).toFixed(1)}%.`);
         setIsTraining(false);
       }, 1000);
     }, 2800);
@@ -361,8 +361,8 @@ export default function AutoMLStudio() {
               Evaluating all 13 single models + Soft Voting Ensemble for dataset: <strong className="text-indigo-600 font-mono">{fileName}</strong>
             </p>
           </div>
-          <span className="px-3.5 py-1.5 bg-indigo-100 text-indigo-800 text-xs font-black rounded-full">
-            📁 Syncing with: {fileName}
+          <span className="px-3.5 py-1.5 bg-gray-100 text-gray-800 text-xs font-bold rounded-full border border-gray-200">
+            Active Dataset: {fileName}
           </span>
         </div>
 
@@ -373,7 +373,7 @@ export default function AutoMLStudio() {
             <span className="text-sm font-semibold text-indigo-700 mb-1">
               {selectedFile ? `Selected File: ${selectedFile.name} (${uploadedRowCount} rows)` : `Currently Active Dataset: ${fileName} (${uploadedRowCount} rows)`}
             </span>
-            <span className="text-xs text-gray-500">Evaluates 13 single model algorithms & constructs a custom Soft Voting Ensemble synced to all 6 platform studios</span>
+            <span className="text-xs text-gray-500">Evaluates 13 single model algorithms & constructs a custom Soft Voting Ensemble synced across the platform</span>
             <input type="file" accept=".csv,.xlsx" onChange={handleFileUpload} className="hidden" />
           </label>
         </div>
@@ -455,7 +455,7 @@ export default function AutoMLStudio() {
                 isTraining ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
               }`}
             >
-              {isTraining ? 'Evaluating Algorithms...' : '⚡ Start AutoML Training'}
+              {isTraining ? 'Evaluating Algorithms...' : 'Start AutoML Training'}
             </button>
           </div>
         </div>
@@ -481,7 +481,7 @@ export default function AutoMLStudio() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <span className="px-3 py-1 bg-yellow-400 text-yellow-950 text-xs font-black rounded-full uppercase tracking-wider">
-                  ★ Soft Voting Ensemble Output ({fileName})
+                  Soft Voting Ensemble Output ({fileName})
                 </span>
                 <h2 className="text-2xl font-bold mt-2">Combined Soft Voting Model Output & Weights</h2>
                 <p className="text-xs text-indigo-200 mt-0.5">
@@ -565,13 +565,13 @@ export default function AutoMLStudio() {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-bold text-gray-900">{m.name}</span>
                         {m.status === 'best_overall_ensemble' && (
-                          <span className="px-2 py-0.5 bg-yellow-400 text-gray-950 text-xs font-black rounded shadow-sm">
-                            ★ Best Overall Soft Voting Ensemble
+                          <span className="px-2.5 py-0.5 bg-yellow-400 text-gray-950 text-xs font-black rounded shadow-sm">
+                            Best Overall Soft Voting Ensemble
                           </span>
                         )}
                         {m.status === 'best_single_model' && (
-                          <span className="px-2 py-0.5 bg-amber-400 text-gray-950 text-xs font-black rounded shadow-sm">
-                            🏆 Best Single Model Algorithm
+                          <span className="px-2.5 py-0.5 bg-amber-400 text-gray-950 text-xs font-black rounded shadow-sm">
+                            Best Single Model Algorithm
                           </span>
                         )}
                       </div>
@@ -595,7 +595,7 @@ export default function AutoMLStudio() {
                         onClick={() => setInspectedModel(m)}
                         className="px-3.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg transition-colors border border-indigo-200"
                       >
-                        🔍 Inspect Matrix & Charts
+                        Inspect Matrix & Charts
                       </button>
                       <button
                         onClick={() => handleDeploy(m)}
@@ -629,7 +629,7 @@ export default function AutoMLStudio() {
                 {/* 1. Heatmap */}
                 <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                   <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span>🟩</span> Seaborn Confusion Matrix Heatmap
+                    Seaborn Confusion Matrix Heatmap
                   </h3>
                   <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
                     <div className="p-6 bg-emerald-600 text-white rounded-2xl text-center border-2 border-emerald-700">
@@ -654,7 +654,7 @@ export default function AutoMLStudio() {
                 {/* 2. Feature Importance for THIS FILE */}
                 <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                   <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <span>📊</span> Seaborn Feature Importance Barplot for '{fileName}'
+                    Seaborn Feature Importance Barplot for '{fileName}'
                   </h3>
                   <div className="space-y-3">
                     {featureImportances.map((f, idx) => (
@@ -664,7 +664,7 @@ export default function AutoMLStudio() {
                           <span>{f.importance}%</span>
                         </div>
                         <div className="w-full bg-gray-100 rounded-full h-3.5 overflow-hidden">
-                          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 h-3.5 rounded-full" style={{ width: `${f.importance}%` }}></div>
+                          <div className="bg-indigo-600 h-3.5 rounded-full" style={{ width: `${f.importance}%` }}></div>
                         </div>
                       </div>
                     ))}

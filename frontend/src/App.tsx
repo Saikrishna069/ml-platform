@@ -17,10 +17,10 @@ export default function App() {
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-3 md:py-0 gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-2xl font-black bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-black text-gray-900 tracking-tight">
                 ML Platform
               </span>
-              <span className="px-2.5 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded-full">
+              <span className="px-2.5 py-0.5 text-xs font-bold bg-gray-100 text-gray-800 rounded-full border border-gray-200">
                 Enterprise v1.2
               </span>
             </div>
@@ -28,51 +28,51 @@ export default function App() {
             <nav className="flex flex-wrap justify-center gap-1">
               <button
                 onClick={() => setActiveTab('datasets')}
-                className={`px-3.5 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                  activeTab === 'datasets' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:text-gray-900'
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                  activeTab === 'datasets' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                📊 Datasets & EDA
+                Datasets & EDA
               </button>
               <button
                 onClick={() => setActiveTab('automl')}
-                className={`px-3.5 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                  activeTab === 'automl' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:text-gray-900'
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                  activeTab === 'automl' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                🤖 AutoML Studio
+                AutoML Studio
               </button>
               <button
                 onClick={() => setActiveTab('mlops')}
-                className={`px-3.5 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                  activeTab === 'mlops' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:text-gray-900'
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                  activeTab === 'mlops' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                ⚡ MLOps Platform
+                MLOps Platform
               </button>
               <button
                 onClick={() => setActiveTab('marketplace')}
-                className={`px-3.5 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                  activeTab === 'marketplace' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:text-gray-900'
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                  activeTab === 'marketplace' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                🏪 Marketplace
+                Marketplace
               </button>
               <button
                 onClick={() => setActiveTab('analytics')}
-                className={`px-3.5 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                  activeTab === 'analytics' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:text-gray-900'
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                  activeTab === 'analytics' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                📈 A/B Analytics
+                A/B Analytics
               </button>
               <button
                 onClick={() => setActiveTab('explainability')}
-                className={`px-3.5 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                  activeTab === 'explainability' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-gray-600 hover:text-gray-900'
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                  activeTab === 'explainability' ? 'bg-indigo-50 text-indigo-700 font-bold' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                🔍 Explainability & SHAP
+                Explainability & SHAP
               </button>
             </nav>
           </div>

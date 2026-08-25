@@ -128,7 +128,7 @@ export default function MLOpsDashboard() {
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 mb-1">MLOps & Deployment Platform</h1>
             <p className="text-sm text-gray-600">
-              Active model deployments trained on uploaded file: <strong className="text-indigo-600 font-mono">{fileName}</strong> (Target: <strong className="text-purple-600 font-mono">{targetColumn}</strong>)
+              Active model deployments trained on uploaded file: <strong className="text-indigo-600 font-mono">{fileName}</strong> (Target: <strong className="text-indigo-900 font-mono">{targetColumn}</strong>)
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -136,11 +136,11 @@ export default function MLOpsDashboard() {
               onClick={() => setShowCanaryModal(true)}
               className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-sm text-sm"
             >
-              🐤 Canary A/B Traffic Splitter
+              Canary A/B Traffic Splitter
             </button>
             <button
               onClick={() => setShowRegisterModal(true)}
-              className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm text-sm"
+              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm text-sm"
             >
               + Register New Model
             </button>
@@ -232,7 +232,7 @@ export default function MLOpsDashboard() {
                       onClick={() => openModelInspector(dep)}
                       className="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold border border-blue-200"
                     >
-                      🔍 Inspect API
+                      Inspect API
                     </button>
                     <button
                       onClick={() => handleRollback(dep.id)}
@@ -283,8 +283,8 @@ export default function MLOpsDashboard() {
                 </div>
 
                 <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                  <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <span>🚀</span> Live Inference API Playground for '{fileName}'
+                  <h3 className="text-sm font-bold text-gray-900 mb-3">
+                    Live Inference API Playground for '{fileName}'
                   </h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -303,7 +303,7 @@ export default function MLOpsDashboard() {
                           isInferring ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
                         }`}
                       >
-                        {isInferring ? 'Sending Request...' : '🚀 Send Live Inference Request'}
+                        {isInferring ? 'Sending Request...' : 'Send Live Inference Request'}
                       </button>
                     </div>
 

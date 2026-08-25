@@ -118,13 +118,13 @@ export default function AdvancedAnalytics() {
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-gray-500 uppercase">Quick Presets:</span>
             <button onClick={() => applyPreset('ecommerce')} className="px-3 py-1.5 bg-white border border-gray-300 hover:border-indigo-500 text-xs font-bold rounded-lg text-gray-700 shadow-sm">
-              🛒 E-Commerce Checkout
+              E-Commerce Checkout
             </button>
             <button onClick={() => applyPreset('app')} className="px-3 py-1.5 bg-white border border-gray-300 hover:border-indigo-500 text-xs font-bold rounded-lg text-gray-700 shadow-sm">
-              📱 Mobile App Signup
+              Mobile App Signup
             </button>
             <button onClick={() => applyPreset('email')} className="px-3 py-1.5 bg-white border border-gray-300 hover:border-indigo-500 text-xs font-bold rounded-lg text-gray-700 shadow-sm">
-              ✉️ Email Click Rate
+              Email Click Rate
             </button>
           </div>
         </div>
@@ -137,7 +137,7 @@ export default function AdvancedAnalytics() {
               activeTab === 'sizing' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            📐 Sample Size Sizing Calculator
+            Sample Size Sizing Calculator
           </button>
           <button
             onClick={() => setActiveTab('power')}
@@ -145,7 +145,7 @@ export default function AdvancedAnalytics() {
               activeTab === 'power' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            📊 Statistical Power & Risk Matrix
+            Statistical Power & Risk Matrix
           </button>
           <button
             onClick={() => setActiveTab('abtest')}
@@ -153,7 +153,7 @@ export default function AdvancedAnalytics() {
               activeTab === 'abtest' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
-            🧪 Sequential A/B Test Simulator
+            Sequential A/B Test Simulator
           </button>
         </div>
 
