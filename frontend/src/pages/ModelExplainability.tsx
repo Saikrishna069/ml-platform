@@ -10,7 +10,6 @@ interface SHAPFeature {
 
 export default function ModelExplainability() {
   const { fileName, targetColumn, featureColumns, featureImportances } = usePlatform();
-  const [activeTab, setActiveTab] = useState<'global' | 'local' | 'boundary'>('global');
   const [selectedInstanceId, setSelectedInstanceId] = useState(1);
 
   // 2D Decision Boundary Feature Axes Selection
@@ -116,101 +115,122 @@ export default function ModelExplainability() {
     { x: minX + 0.88 * (maxX - minX), y: minY + 0.78 * (maxY - minY), class: 2, label: `${fileName} Row #6` }
   ];
 
+  // Download Explainability Report Handler
+  const downloadReport = () => {
+    const reportLines: string[] = [];
+    reportLines.push(`# MODEL EXPLAINABILITY & SHAP EVALUATION REPORT`);
+    reportLines.push(`**Dataset File**: \`${fileName}\``);
+    reportLines.push(`**Target Column**: \`${targetColumn}\``);
+    reportLines.push(`**Generated Date**: ${new Date().toLocaleString()}`);
+    reportLines.push(`\n---\n`);
+
+    reportLines.push(`## 1. 📊 Global Feature Attribution (TreeSHAP Ranking)`);
+    reportLines.push(`| Rank | Feature Name | Importance (%) |`);
+    reportLines.push(`|:-----|:-------------|---------------:|`);
+    featureImportances.forEach((f, idx) => {
+      reportLines.push(`| #${idx + 1} | ${f.name} | ${f.importance}% |`);
+    });
+    reportLines.push(`\n---\n`);
+
+    reportLines.push(`## 2. 🔍 Local Instance Prediction Waterfall Explanation (File Row #${selectedInstanceId})`);
+    reportLines.push(`- **Base Expected Value E[f(x)]**: ${currentLocal.base_value}`);
+    reportLines.push(`- **Final Model Prediction f(x)**: ${currentLocal.final_pred}`);
+    reportLines.push(`\n| Feature Name | Value | SHAP Contribution | Direction |`);
+    reportLines.push(`|:-------------|------:|------------------:|:----------|`);
+    currentLocal.features.forEach(feat => {
+      reportLines.push(`| ${feat.name} | ${feat.feature_value} | ${feat.shap_value >= 0 ? '+' : ''}${feat.shap_value} | ${feat.impact_direction.toUpperCase()} |`);
+    });
+    reportLines.push(`\n---\n`);
+
+    reportLines.push(`## 3. 🗺️ 2D Decision Boundary Contour Region Map`);
+    reportLines.push(`- **X-Axis Feature**: \`${featureX}\` (Min: ${minX}, Max: ${maxX})`);
+    reportLines.push(`- **Y-Axis Feature**: \`${featureY}\` (Min: ${minY}, Max: ${maxY})`);
+    reportLines.push(`- **Boundary Kernel**: \`${boundaryKernel.toUpperCase()}\``);
+    reportLines.push(`- **Mesh Grid Resolution**: ${meshResolution}x${meshResolution}`);
+
+    const blob = new Blob([reportLines.join('\n')], { type: 'text/markdown;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${fileName.split('.')[0]}_explainability_report.md`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 font-sans">
       <div className="max-w-7xl mx-auto">
-        {/* Header Title */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Header Title & Download Report Button */}
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 mb-1">Model Explainability & SHAP Visualizer</h1>
             <p className="text-sm text-gray-600">
-              Accurate 2D Decision Boundary Contour Maps for uploaded file: <strong className="text-indigo-600 font-mono">{fileName}</strong> (Target: <strong className="text-purple-600 font-mono">{targetColumn}</strong>)
+              Accurate SHAP Attributions, Waterfall Plots, and 2D Decision Boundary Contour Maps for uploaded file: <strong className="text-indigo-600 font-mono">{fileName}</strong> (Target: <strong className="text-purple-600 font-mono">{targetColumn}</strong>)
             </p>
           </div>
-          <span className="px-3.5 py-1.5 bg-indigo-100 text-indigo-800 text-xs font-black rounded-full">
-            📁 Active Dataset: {fileName}
-          </span>
-        </div>
 
-        {/* 3 Main Explainability Sub-Tabs */}
-        <div className="flex border-b border-gray-200 bg-white rounded-t-xl px-6 pt-3 space-x-8 mb-8 border shadow-sm">
           <button
-            onClick={() => setActiveTab('global')}
-            className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
-              activeTab === 'global' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900'
-            }`}
+            onClick={downloadReport}
+            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold rounded-xl shadow-md text-sm min-w-[240px] flex items-center justify-center gap-2 transition-all"
           >
-            📊 Global Feature Attribution ({fileName})
-          </button>
-          <button
-            onClick={() => setActiveTab('local')}
-            className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
-              activeTab === 'local' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900'
-            }`}
-          >
-            🔍 Local Instance Waterfall Explanation
-          </button>
-          <button
-            onClick={() => setActiveTab('boundary')}
-            className={`pb-3 text-sm font-bold border-b-2 transition-colors ${
-              activeTab === 'boundary' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-900'
-            }`}
-          >
-            🗺️ Accurate 2D Decision Boundary Contour Map
+            <span>📥</span> Download Explainability Report (.md)
           </button>
         </div>
 
-        {/* TAB 1: GLOBAL SHAP FEATURE ATTRIBUTION */}
-        {activeTab === 'global' && (
-          <div className="space-y-8">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h2 className="text-lg font-bold text-gray-900">Global Mean |SHAP Value| Feature Ranking for '{fileName}'</h2>
-                  <p className="text-xs text-gray-500 mt-0.5">Ranks your exact dataset columns by overall impact on target '{targetColumn}'</p>
-                </div>
-                <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-full">
-                  TreeSHAP Explainer Engine
-                </span>
+        {/* ALL THREE SUBSECTIONS TOGETHER ON ONE SINGLE PAGE */}
+        <div className="space-y-10">
+
+          {/* SUBSECTION 1: GLOBAL SHAP FEATURE ATTRIBUTION */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <span>📊</span> 1. Global Feature Attribution (SHAP Summary) for '{fileName}'
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">Ranks your exact dataset columns by overall impact on target '{targetColumn}'</p>
               </div>
+              <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-black rounded-full">
+                TreeSHAP Explainer Engine
+              </span>
+            </div>
 
-              {/* SHAP Ranking Bars */}
-              <div className="space-y-4 mb-8">
-                {featureImportances.map((f, idx) => (
-                  <div key={idx} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                    <div className="flex justify-between text-xs font-bold text-gray-800 mb-1.5 font-mono">
-                      <span>#{idx + 1} {f.name}</span>
-                      <span>Importance = {f.importance}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 h-4 rounded-full transition-all"
-                        style={{ width: `${f.importance}%` }}
-                      ></div>
-                    </div>
+            {/* SHAP Ranking Bars */}
+            <div className="space-y-4 mb-6">
+              {featureImportances.map((f, idx) => (
+                <div key={idx} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="flex justify-between text-xs font-bold text-gray-800 mb-1.5 font-mono">
+                    <span>#{idx + 1} {f.name}</span>
+                    <span>Importance = {f.importance}%</span>
                   </div>
-                ))}
-              </div>
-
-              <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900 flex items-start gap-3">
-                <span className="text-lg">💡</span>
-                <div>
-                  <p className="font-bold">Global Feature Insights for '{fileName}':</p>
-                  <p className="mt-0.5">
-                    Column <strong>{featureImportances[0]?.name}</strong> and <strong>{featureImportances[1]?.name}</strong> contribute the highest predictive power towards target <strong>{targetColumn}</strong>.
-                  </p>
+                  <div className="w-full bg-gray-200 h-4 rounded-full overflow-hidden">
+                    <div
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 h-4 rounded-full transition-all"
+                      style={{ width: `${f.importance}%` }}
+                    ></div>
+                  </div>
                 </div>
+              ))}
+            </div>
+
+            <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900 flex items-start gap-3">
+              <span className="text-lg">💡</span>
+              <div>
+                <p className="font-bold">Global Feature Insights for '{fileName}':</p>
+                <p className="mt-0.5">
+                  Column <strong>{featureImportances[0]?.name}</strong> and <strong>{featureImportances[1]?.name}</strong> contribute the highest predictive power towards target <strong>{targetColumn}</strong>.
+                </p>
               </div>
             </div>
           </div>
-        )}
 
-        {/* TAB 2: LOCAL INSTANCE WATERFALL EXPLANATION */}
-        {activeTab === 'local' && (
+          {/* SUBSECTION 2: LOCAL INSTANCE WATERFALL EXPLANATION */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Local Instance Prediction Waterfall Plot for '{fileName}'</h2>
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <span>🔍</span> 2. Local Instance Prediction Waterfall Explanation for '{fileName}'
+                </h2>
                 <p className="text-xs text-gray-500 mt-0.5">Decomposes single prediction $f(x)$ for target '{targetColumn}' into baseline $E[f(x)]$ + feature SHAP contributions</p>
               </div>
 
@@ -258,15 +278,13 @@ export default function ModelExplainability() {
               ))}
             </div>
           </div>
-        )}
 
-        {/* TAB 3: ACCURATE 2D DECISION BOUNDARY CONTOUR MAP */}
-        {activeTab === 'boundary' && (
+          {/* SUBSECTION 3: ACCURATE 2D DECISION BOUNDARY CONTOUR MAP */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <span>🗺️</span> Accurate 2D Decision Boundary Contour Map for '{fileName}'
+                  <span>🗺️</span> 3. Accurate 2D Decision Boundary Contour Map for '{fileName}'
                 </h2>
                 <p className="text-xs text-gray-500 mt-0.5">Calculates mathematical decision regions between '{featureX}' and '{featureY}' for target '{targetColumn}'</p>
               </div>
@@ -376,7 +394,8 @@ export default function ModelExplainability() {
               </div>
             </div>
           </div>
-        )}
+
+        </div>
       </div>
     </div>
   );
